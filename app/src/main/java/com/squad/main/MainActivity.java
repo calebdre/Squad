@@ -21,6 +21,7 @@ import com.jakewharton.rxbinding.view.RxView;
 import com.squad.ChooseActivity;
 import com.squad.R;
 import com.squad.model.FacebookGraphResponse;
+import com.squad.profile.ProfileActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
                         FacebookGraphResponse queriedUser = FacebookGraphResponse.create(dataSnapshot);
                         if (user.id().equals(queriedUser.id())) {
                             userReference.removeEventListener(searchUserListener);
-                            goToNextPage(queriedUser);
+                            goToChoose(queriedUser);
                         }
                     }
 
@@ -95,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
                     FacebookGraphResponse modifiedUser = FacebookGraphResponse.addFBId(user, push.getKey());
 
                     push.setValue(modifiedUser.toFirebaseValue());
-                    goToNextPage(modifiedUser);
+                    goToProfile(modifiedUser);
                 });
             }
 
@@ -111,7 +112,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void goToNextPage(FacebookGraphResponse user) {
+    private void goToProfile(FacebookGraphResponse modifiedUser) {
+        Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+        intent.putExtra(ChooseActivity.EXTRA_FB_USER, modifiedUser);
+        startActivity(intent);
+    }
+
+    private void goToChoose(FacebookGraphResponse user) {
         Intent intent = new Intent(MainActivity.this, ChooseActivity.class);
         intent.putExtra(ChooseActivity.EXTRA_FB_USER, user);
         startActivity(intent);

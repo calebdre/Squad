@@ -21,7 +21,7 @@ public class MainModel {
                     onUser.call(user);
                 });
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,name,about,picture.width(500).height(500)");
+        parameters.putString("fields", "id,name,about,picture.width(200).height(200)");
         request.setParameters(parameters);
         request.executeAsync();
     }
