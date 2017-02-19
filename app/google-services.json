@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "542107082224",
+    "firebase_url": "https://squad-2cae0.firebaseio.com",
+    "project_id": "squad-2cae0",
+    "storage_bucket": "squad-2cae0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:542107082224:android:c1165c1efdacb2d0",
+        "android_client_info": {
+          "package_name": "com.squad"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "542107082224-sbr9gqklaplka1bmpca29kr3mgn31urs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.squad",
+            "certificate_hash": "CDA83F77E3D15745E1CD2F3CFFF7CC0E12F9F6E9"
+          }
+        },
+        {
+          "client_id": "542107082224-qmgevf0dvk8l0rtjlcppu789fdottss1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDsyHXAeIkxoCKoF5xX5Ak8tM-mxdX8uqM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "542107082224-qmgevf0dvk8l0rtjlcppu789fdottss1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
