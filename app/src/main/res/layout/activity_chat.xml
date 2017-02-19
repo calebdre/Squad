@@ -13,12 +13,19 @@
         android:layout_width="match_parent"
         android:orientation="horizontal"
         android:layout_height="wrap_content">
-        <EditText
-            android:id="@+id/chat_message_entry"
+        <android.support.design.widget.TextInputLayout
             android:layout_width="0dp"
             android:layout_weight="2"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content">
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/chat_message_entry"
+                android:hint="Type your message here"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </android.support.design.widget.TextInputLayout>
         <Button
+            android:backgroundTint="@color/colorAccent"
+            android:textColor="#fff"
             android:id="@+id/chat_send_message_button"
             android:text="Send"
             android:layout_width="wrap_content"

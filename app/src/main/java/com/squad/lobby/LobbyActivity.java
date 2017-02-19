@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
@@ -43,6 +44,7 @@ public class LobbyActivity extends AppCompatActivity {
 
     public static final java.lang.String EXTRA_LOBBY_KEY = "extra_lobby_key";
 
+    @BindView(R.id.lobby_toolbar) Toolbar toolbar;
     @BindView(R.id.lobby_members_count) TextView memberCount;
     @BindView(R.id.lobby_item_image) ImageView lobbyImage;
     @BindView(R.id.lobby_host_image) ImageView hostImage;
@@ -59,6 +61,15 @@ public class LobbyActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lobby);
         ButterKnife.bind(this);
+
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        toolbar.setTitle("Squad Details");
+        toolbar.setNavigationIcon(R.drawable.left_arrow);
+        toolbar.setNavigationOnClickListener((f) -> {
+            onBackPressed();
+        });
 
         Bundle extras = getIntent().getExtras();
         Lobby lobby = (Lobby) extras.getSerializable(EXTRA_LOBBY);

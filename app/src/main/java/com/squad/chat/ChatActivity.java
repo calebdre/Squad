@@ -39,7 +39,7 @@ public class ChatActivity extends AppCompatActivity {
         String key = getIntent().getExtras().getString(EXTRA_LOBBY_KEY);
         FacebookGraphResponse user = (FacebookGraphResponse) getIntent().getExtras().getSerializable(ChooseActivity.EXTRA_FB_USER);
 
-        ChatRecyclerAdapter adapter = new ChatRecyclerAdapter(key);
+        ChatRecyclerAdapter adapter = new ChatRecyclerAdapter(key, user.fbId());
         messagesList.setLayoutManager(new LinearLayoutManager(this));
         messagesList.setAdapter(adapter);
 
@@ -77,6 +77,7 @@ public class ChatActivity extends AppCompatActivity {
             ChatMessage chatMessage = ChatMessage.builder()
                     .message(messageEntry.getText().toString())
                     .name(user.name())
+                    .userId(user.fbId())
                     .time(Calendar.getInstance().getTimeInMillis())
                     .build();
 

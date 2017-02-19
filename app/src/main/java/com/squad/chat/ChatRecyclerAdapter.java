@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.firebase.database.ChildEventListener;
@@ -21,10 +22,12 @@ import java.util.List;
 
 public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapter.ChatViewHolder> {
 
+    private final String userKey;
     List<ChatMessage> chatMessages = new ArrayList<>();
     List<String> chatMessageIds = new ArrayList<>();
 
-    public ChatRecyclerAdapter(String lobbyId) {
+    public ChatRecyclerAdapter(String lobbyId, String userKey) {
+        this.userKey = userKey;
         init(lobbyId);
     }
 
@@ -89,6 +92,13 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapte
         PrettyTime p = new PrettyTime();
         String ago = p.format(new Date(message.time()));
         holder.time.setText(ago);
+
+        Context context = holder.container.getContext();
+        if(userKey.equals(message.userId())) {
+            holder.container.setBackground(context.getDrawable(R.drawable.outgoing_bubble));
+        }else {
+            holder.container.setBackground(context.getDrawable(R.drawable.incoming_bubble));
+        }
     }
 
     @Override
@@ -98,6 +108,7 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapte
 
     public class ChatViewHolder extends RecyclerView.ViewHolder{
 
+        LinearLayout container;
         TextView name;
         TextView message;
         TextView time;
@@ -105,6 +116,7 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapte
         public ChatViewHolder(View itemView) {
             super(itemView);
             name = (TextView) itemView.findViewById(R.id.chat_item_name);
+            container = (LinearLayout) itemView.findViewById(R.id.container);
             message = (TextView) itemView.findViewById(R.id.chat_item_message);
             time = (TextView) itemView.findViewById(R.id.chat_item_time);
         }

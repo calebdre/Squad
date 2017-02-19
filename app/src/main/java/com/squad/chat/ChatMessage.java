@@ -11,6 +11,7 @@ import me.mattlogan.auto.value.firebase.annotation.FirebaseValue;
 public abstract class ChatMessage {
 
     public abstract String name();
+    public abstract String userId();
     public abstract String message();
     public abstract long time();
 
@@ -33,6 +34,7 @@ public abstract class ChatMessage {
     @AutoValue.Builder
     public static abstract class Builder {
         public abstract Builder name(String name);
+        public abstract Builder userId(String userId);
         public abstract Builder message(String message);
         public abstract Builder time(long key);
 
