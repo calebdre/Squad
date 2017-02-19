@@ -1,10 +1,12 @@
 package com.squad.join;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.database.ChildEventListener;
@@ -14,11 +16,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squad.R;
+import com.squad.foursquare.FourSquare;
 import com.squad.model.FacebookGraphResponse;
 import com.squad.model.FireBaseLobby;
+import com.squareup.picasso.Picasso;
 
 import org.ocpsoft.prettytime.PrettyTime;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -146,6 +151,16 @@ public class JoinSquadRecyclerAdapter extends RecyclerView.Adapter<JoinSquadRecy
             }
         });
 
+        try {
+            new FourSquare().getImageForLocation(lobby.location().lat(), lobby.location().lng(), lobby.location().address(), (url) -> {
+                ((Activity) context).runOnUiThread(() -> {
+                    Picasso.with(context).load(url).into(holder.image);
+                });
+
+            });
+        } catch (IOException e) {
+        }
+
         holder.title.setText(lobby.activity() + " at " + lobby.location().name());
         holder.name.setText(lobby.name());
         holder.createdAt.setText(ago);
@@ -189,6 +204,7 @@ public class JoinSquadRecyclerAdapter extends RecyclerView.Adapter<JoinSquadRecy
 
     public class JoinSquadRecyclerViewHolder extends RecyclerView.ViewHolder {
 
+        ImageView image;
         TextView title;
         TextView name;
         TextView createdAt;
@@ -206,6 +222,7 @@ public class JoinSquadRecyclerAdapter extends RecyclerView.Adapter<JoinSquadRecy
             host = (TextView) itemView.findViewById(R.id.lobby_item_host);
             distance = (TextView) itemView.findViewById(R.id.lobby_item_distance);
             size = (TextView) itemView.findViewById(R.id.lobby_item_size);
+            image = (ImageView) itemView.findViewById(R.id.lobby_item_image);
             this.itemView = itemView;
         }
     }
