@@ -14,7 +14,6 @@
     </android.support.v7.widget.Toolbar>
     <ImageView
         android:id="@+id/lobby_item_image"
-        android:transitionName="lobby_item_image"
         android:layout_width="match_parent"
         android:scaleType="fitXY"
         android:layout_height="180dp"/>
@@ -97,7 +96,7 @@
                     android:layout_height="wrap_content"/>
                 <TextView
                     android:id="@+id/lobby_members_count"
-                    android:text="4 memebers"
+                    android:text="up to 4 memebers"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
             </LinearLayout>

@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -65,10 +64,9 @@ public class JoinSquadActivity extends AppCompatActivity implements GoogleApiCli
                     .push()
                     .setValue(user.toFirebaseValue());
             Intent intent = new Intent(this, LobbyActivity.class);
-            ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, pair.second, "lobby_item_image");
             intent.putExtra(EXTRA_LOBBY_KEY, pair.first);
             intent.putExtra(EXTRA_FB_USER, user);
-            startActivity(intent, options.toBundle());
+            startActivity(intent);
         });
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

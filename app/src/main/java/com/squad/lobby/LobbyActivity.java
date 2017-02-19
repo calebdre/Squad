@@ -8,7 +8,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -77,6 +76,7 @@ public class LobbyActivity extends AppCompatActivity {
         PrettyTime p = new PrettyTime();
         String key = extras.getString(EXTRA_LOBBY_KEY);
         FacebookGraphResponse user = (FacebookGraphResponse) extras.getSerializable(EXTRA_FB_USER);
+
         FirebaseDatabase.getInstance()
                 .getReference("lobbies/" + key + "/ready")
                 .addValueEventListener(new ValueEventListener() {
@@ -108,21 +108,9 @@ public class LobbyActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     FireBaseLobby lobby = FireBaseLobby.create(dataSnapshot);
-
                     try {
                         new FourSquare().getImageForLocation(lobby.location().lat(), lobby.location().lng(), lobby.location().address(), (url) -> {
                             Picasso.with(LobbyActivity.this).load(url).into(lobbyImage);
-                            supportPostponeEnterTransition();
-                            lobbyImage.getViewTreeObserver().addOnPreDrawListener(
-                                    new ViewTreeObserver.OnPreDrawListener() {
-                                        @Override
-                                        public boolean onPreDraw() {
-                                            lobbyImage.getViewTreeObserver().removeOnPreDrawListener(this);
-                                            supportStartPostponedEnterTransition();
-                                            return true;
-                                        }
-                                    }
-                            );
                         });
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -161,6 +149,13 @@ public class LobbyActivity extends AppCompatActivity {
                 }
             });
         }else{
+            try {
+                new FourSquare().getImageForLocation(lobby.location().lat(), lobby.location().lng(), lobby.location().address(), (url) -> {
+                    Picasso.with(LobbyActivity.this).load(url).into(lobbyImage);
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             MeetupLocation location = (MeetupLocation) extras.getSerializable(EXTRA_MEETUP_LOCATION);
 
             String ago = p.format(new Date(lobby.createdAt()));

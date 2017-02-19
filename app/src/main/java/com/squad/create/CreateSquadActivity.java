@@ -4,12 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -43,14 +44,17 @@ public class CreateSquadActivity extends AppCompatActivity {
 
     @BindView(R.id.create_squad_activity_input) AutoCompleteTextView activityInput;
     @BindView(R.id.create_squad_toolbar) Toolbar toolbar;
-    @BindView(R.id.create_squad_place_input) TextInputEditText placeInput;
+    @BindView(R.id.create_squad_place_input) Button placeInput;
     @BindView(R.id.create_squad_name) TextView squadNameView;
+    @BindView(R.id.create_squad_place_name) TextView placeName;
+    @BindView(R.id.create_squad_name_prefix) TextView placePrefix;
     @BindView(R.id.create_squad_submit_button) FloatingActionButton submitButton;
 
     private MeetupLocation location;
 
     private static final String[] ACTIVITIES = new String[] {
-            "play put put", "swim", "go out to eat", "watch GoT", "go to the gym"
+            "Play put put", "Swim", "Go out to eat", "Watch GoT", "Workout", "Taking a long drive", "Movie night", "Dancing", "DnD",
+            "Going to a conference", "PantherHackers Workshop", "Winning a hackathon"
     };
     private String squadName;
 
@@ -76,7 +80,7 @@ public class CreateSquadActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, ACTIVITIES);
         activityInput.setAdapter(adapter);
 
-        RxView.touches(placeInput).subscribe((aVoid) -> {
+        RxView.clicks(placeInput).subscribe((aVoid) -> {
             try {
                 Intent intent =
                         new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
@@ -132,7 +136,11 @@ public class CreateSquadActivity extends AppCompatActivity {
                         .lng(place.getLatLng().longitude)
                         .build();
 
-                placeInput.setText(location.name());
+                placeName.setText(location.name());
+                placeName.setVisibility(View.VISIBLE);
+                placePrefix.setVisibility(View.VISIBLE);
+                placeInput.setText("Select a different location to meet");
+
                 Log.i(TAG, "Place: " + place.getName());
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(this, data);

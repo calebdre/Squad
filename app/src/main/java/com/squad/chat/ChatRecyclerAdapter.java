@@ -94,12 +94,26 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapte
         holder.time.setText(ago);
 
         Context context = holder.container.getContext();
+        ViewGroup.MarginLayoutParams f = (ViewGroup.MarginLayoutParams) holder.container.getLayoutParams();
         if(userKey.equals(message.userId())) {
+            f.setMargins(400, 30,0 , 30);
+            holder.container.requestLayout();
             holder.container.setBackground(context.getDrawable(R.drawable.outgoing_bubble));
         }else {
+            f.setMargins(40, 30,0 , 30);
+            holder.container.requestLayout();
             holder.container.setBackground(context.getDrawable(R.drawable.incoming_bubble));
         }
     }
+
+    public static void setMargins (View v, int l, int t, int r, int b) {
+        if (v.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+            ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
+            p.setMargins(l, t, r, b);
+            v.requestLayout();
+        }
+    }
+
 
     @Override
     public int getItemCount() {
