@@ -3,14 +3,13 @@ package com.squad.create;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
-import android.text.SpannableString;
-import android.text.style.UnderlineSpan;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -43,9 +42,10 @@ public class CreateSquadActivity extends AppCompatActivity {
     public static final String EXTRA_LOBBY = "extra_lobby";
 
     @BindView(R.id.create_squad_activity_input) AutoCompleteTextView activityInput;
-    @BindView(R.id.create_squad_place_input) EditText placeInput;
+    @BindView(R.id.create_squad_toolbar) Toolbar toolbar;
+    @BindView(R.id.create_squad_place_input) TextInputEditText placeInput;
     @BindView(R.id.create_squad_name) TextView squadNameView;
-    @BindView(R.id.create_squad_submit_button) Button submitButton;
+    @BindView(R.id.create_squad_submit_button) FloatingActionButton submitButton;
 
     private MeetupLocation location;
 
@@ -60,17 +60,23 @@ public class CreateSquadActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_squad);
         ButterKnife.bind(this);
 
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        toolbar.setTitle("Start a Squad");
+        toolbar.setNavigationIcon(R.drawable.left_arrow);
+        toolbar.setNavigationOnClickListener((aVoid) -> {
+            onBackPressed();
+        });
+
         squadName = new HaikunatorBuilder().setTokenLength(0).setDelimiter(" ").build().haikunate();
-        String prefix = "Your squad name will be ";
-        String text = prefix + squadName;
-        SpannableString content = new SpannableString(text);
-        content.setSpan(new UnderlineSpan(), prefix.length(), text.length(), 0);
-        squadNameView.setText(content);
+        squadNameView.setText(squadName );
+        placeInput.setKeyListener(null);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, ACTIVITIES);
         activityInput.setAdapter(adapter);
 
-        RxView.clicks(placeInput).subscribe((aVoid) -> {
+        RxView.touches(placeInput).subscribe((aVoid) -> {
             try {
                 Intent intent =
                         new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)

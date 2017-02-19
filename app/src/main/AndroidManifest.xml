@@ -30,7 +30,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".ChooseActivity"/>
-        <activity android:name=".create.CreateSquadActivity"/>
+        <activity android:name=".create.CreateSquadActivity"
+                  android:label="Start a Squad"
+                  android:windowSoftInputMode="adjustResize"/>
         <activity android:name=".join.JoinSquadActivity"/>
         <activity android:name=".lobby.LobbyActivity"/>
         <activity android:name=".chat.ChatActivity"/>
