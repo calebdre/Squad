@@ -7,7 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -17,13 +19,17 @@ import com.google.firebase.database.ValueEventListener;
 import com.jakewharton.rxbinding.view.RxView;
 import com.squad.R;
 import com.squad.chat.ChatActivity;
+import com.squad.foursquare.FourSquare;
 import com.squad.model.FacebookGraphResponse;
 import com.squad.model.FireBaseLobby;
 import com.squad.model.Lobby;
 import com.squad.model.MeetupLocation;
+import com.squad.profile.CircleTransform;
+import com.squareup.picasso.Picasso;
 
 import org.ocpsoft.prettytime.PrettyTime;
 
+import java.io.IOException;
 import java.util.Date;
 
 import butterknife.BindView;
@@ -37,6 +43,9 @@ public class LobbyActivity extends AppCompatActivity {
 
     public static final java.lang.String EXTRA_LOBBY_KEY = "extra_lobby_key";
 
+    @BindView(R.id.lobby_members_count) TextView memberCount;
+    @BindView(R.id.lobby_item_image) ImageView lobbyImage;
+    @BindView(R.id.lobby_host_image) ImageView hostImage;
     @BindView(R.id.lobby_activity) TextView activity;
     @BindView(R.id.lobby_created_at) TextView createdAt;
     @BindView(R.id.lobby_host_name) TextView hostName;
@@ -53,6 +62,7 @@ public class LobbyActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         Lobby lobby = (Lobby) extras.getSerializable(EXTRA_LOBBY);
+
         PrettyTime p = new PrettyTime();
         String key = extras.getString(EXTRA_LOBBY_KEY);
         FacebookGraphResponse user = (FacebookGraphResponse) extras.getSerializable(EXTRA_FB_USER);
@@ -87,6 +97,25 @@ public class LobbyActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     FireBaseLobby lobby = FireBaseLobby.create(dataSnapshot);
+
+                    try {
+                        new FourSquare().getImageForLocation(lobby.location().lat(), lobby.location().lng(), lobby.location().address(), (url) -> {
+                            Picasso.with(LobbyActivity.this).load(url).into(lobbyImage);
+                            supportPostponeEnterTransition();
+                            lobbyImage.getViewTreeObserver().addOnPreDrawListener(
+                                    new ViewTreeObserver.OnPreDrawListener() {
+                                        @Override
+                                        public boolean onPreDraw() {
+                                            lobbyImage.getViewTreeObserver().removeOnPreDrawListener(this);
+                                            supportStartPostponedEnterTransition();
+                                            return true;
+                                        }
+                                    }
+                            );
+                        });
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     String ago = p.format(new Date(lobby.created()));
 
                     activity.setText(lobby.activity());
@@ -96,7 +125,7 @@ public class LobbyActivity extends AppCompatActivity {
 
                     LobbyRecyclerAdapter adapter = new LobbyRecyclerAdapter(LobbyActivity.this, key);
                     usersList.setAdapter(adapter);
-                    usersList.setLayoutManager(new LinearLayoutManager(LobbyActivity.this));
+                    usersList.setLayoutManager(new LinearLayoutManager(LobbyActivity.this, LinearLayoutManager.HORIZONTAL, false));
 
                     FirebaseDatabase.getInstance()
                             .getReference("/users/" + lobby.host())
@@ -104,7 +133,8 @@ public class LobbyActivity extends AppCompatActivity {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     FacebookGraphResponse host = FacebookGraphResponse.create(dataSnapshot);
-                                    hostName.setText(host.name());
+                                    hostName.setText("Organized by " + host.name());
+                                    Picasso.with(LobbyActivity.this).load(host.picture().data().url()).transform(new CircleTransform()).into(hostImage);
                                 }
 
                                 @Override
@@ -124,7 +154,7 @@ public class LobbyActivity extends AppCompatActivity {
 
             String ago = p.format(new Date(lobby.createdAt()));
 
-            activity.setText(lobby.activity());
+            activity.setText(lobby.name() + " @ " +lobby.activity());
             createdAt.setText(ago);
             hostName.setText(lobby.host().name());
             placeAddress.setText(location.address());

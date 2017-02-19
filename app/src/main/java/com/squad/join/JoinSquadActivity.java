@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -58,15 +59,16 @@ public class JoinSquadActivity extends AppCompatActivity implements GoogleApiCli
         recyclerView.setLayoutManager(new LinearLayoutManager(JoinSquadActivity.this));
         recyclerView.setAdapter(adapter);
 
-        adapter.onLobbySelect().subscribe((lobbyId) -> {
+        adapter.onLobbySelect().subscribe((pair) -> {
             FirebaseDatabase.getInstance()
-                    .getReference("lobbies/" +lobbyId +"/users/")
+                    .getReference("lobbies/" +pair.first +"/users/")
                     .push()
                     .setValue(user.toFirebaseValue());
             Intent intent = new Intent(this, LobbyActivity.class);
-            intent.putExtra(EXTRA_LOBBY_KEY, lobbyId);
+            ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, pair.second, "lobby_item_image");
+            intent.putExtra(EXTRA_LOBBY_KEY, pair.first);
             intent.putExtra(EXTRA_FB_USER, user);
-            startActivity(intent);
+            startActivity(intent, options.toBundle());
         });
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

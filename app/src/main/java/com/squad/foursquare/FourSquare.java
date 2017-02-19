@@ -96,7 +96,7 @@ public class FourSquare {
 
                     Handler mainHandler = new Handler(Looper.getMainLooper());
 
-                    Runnable myRunnable = () -> onGetImageUrl.call(item.prefix() + "600x600" + item.suffix());
+                    Runnable myRunnable = () -> onGetImageUrl.call(item.prefix() + "1300x500" + item.suffix());
                     mainHandler.post(myRunnable);
                 }
             }

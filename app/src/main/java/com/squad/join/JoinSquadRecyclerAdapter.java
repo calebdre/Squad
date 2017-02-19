@@ -2,6 +2,7 @@ package com.squad.join;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +18,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squad.R;
 import com.squad.foursquare.FourSquare;
-import com.squad.model.FacebookGraphResponse;
 import com.squad.model.FireBaseLobby;
 import com.squareup.picasso.Picasso;
 
@@ -39,7 +39,7 @@ public class JoinSquadRecyclerAdapter extends RecyclerView.Adapter<JoinSquadRecy
     Context context;
     private double currentLat = 0;
     private double currentLnng = 0;
-    private PublishSubject<String> lobbySubject = PublishSubject.create();
+    private PublishSubject<Pair<String, View>> lobbySubject = PublishSubject.create();
 
     public JoinSquadRecyclerAdapter(Context context) {
         this.context = context;
@@ -52,7 +52,7 @@ public class JoinSquadRecyclerAdapter extends RecyclerView.Adapter<JoinSquadRecy
         notifyDataSetChanged();
     }
 
-    public PublishSubject<String> onLobbySelect() {
+    public PublishSubject<Pair<String, View>> onLobbySelect() {
         return lobbySubject;
     }
 
@@ -128,28 +128,10 @@ public class JoinSquadRecyclerAdapter extends RecyclerView.Adapter<JoinSquadRecy
     @Override
     public void onBindViewHolder(JoinSquadRecyclerViewHolder holder, int position) {
         FireBaseLobby lobby = fireBaseLobbyList.get(position);
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                lobbySubject.onNext(fireBaseLobbyListIds.get(position));
-            }
-        });
+        holder.itemView.setOnClickListener(v -> lobbySubject.onNext(new Pair<>(fireBaseLobbyListIds.get(position), holder.image)));
         PrettyTime p = new PrettyTime();
         String ago = p.format(new Date(lobby.created()));
         String currentLobbyId = fireBaseLobbyListIds.get(position);
-
-        FirebaseDatabase.getInstance().getReference("/users/" + lobby.host()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                FacebookGraphResponse user = FacebookGraphResponse.create(dataSnapshot);
-                holder.host.setText("hosted by " + user.name());
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
 
         try {
             new FourSquare().getImageForLocation(lobby.location().lat(), lobby.location().lng(), lobby.location().address(), (url) -> {
@@ -162,11 +144,6 @@ public class JoinSquadRecyclerAdapter extends RecyclerView.Adapter<JoinSquadRecy
         }
 
         holder.title.setText(lobby.activity() + " at " + lobby.location().name());
-        holder.name.setText(lobby.name());
-        holder.createdAt.setText(ago);
-        if(currentLnng != 0 && currentLat != 0) {
-            holder.distance.setText(Calculator.distance(currentLat, currentLnng, lobby.location().lat(), lobby.location().lng()) + "km away");
-        }
 
         lobbyCountMap.put(currentLobbyId, 0);
         FirebaseDatabase.getInstance().getReference("lobbies/" + currentLobbyId + "/users").addChildEventListener(new ChildEventListener() {
@@ -206,22 +183,12 @@ public class JoinSquadRecyclerAdapter extends RecyclerView.Adapter<JoinSquadRecy
 
         ImageView image;
         TextView title;
-        TextView name;
-        TextView createdAt;
-        TextView host;
-        TextView distance;
-        TextView size;
         View itemView;
 
         public JoinSquadRecyclerViewHolder(View itemView) {
             super(itemView);
 
             title = (TextView) itemView.findViewById(R.id.lobby_item_title);
-            name = (TextView) itemView.findViewById(R.id.lobby_item_name);
-            createdAt = (TextView) itemView.findViewById(R.id.lobby_item_created_at);
-            host = (TextView) itemView.findViewById(R.id.lobby_item_host);
-            distance = (TextView) itemView.findViewById(R.id.lobby_item_distance);
-            size = (TextView) itemView.findViewById(R.id.lobby_item_size);
             image = (ImageView) itemView.findViewById(R.id.lobby_item_image);
             this.itemView = itemView;
         }

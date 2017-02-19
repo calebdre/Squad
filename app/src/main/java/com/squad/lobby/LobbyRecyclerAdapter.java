@@ -15,6 +15,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squad.R;
 import com.squad.model.FacebookGraphResponse;
+import com.squad.profile.CircleTransform;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -92,11 +93,8 @@ public class LobbyRecyclerAdapter extends RecyclerView.Adapter<LobbyRecyclerAdap
 // Get the data model based on position
         FacebookGraphResponse user = users.get(position);
 
-        // Set item views based on your views and data model
-        String about = user.about() == null ? "" : user.about();
-        holder.descriptionTextView.setText(about);
         holder.nameTextView.setText(user.name());
-        Picasso.with(context).load(user.picture().data().url()).into(holder.image);
+        Picasso.with(context).load(user.picture().data().url()).transform(new CircleTransform()).into(holder.image);
     }
 
     @Override
@@ -108,7 +106,6 @@ public class LobbyRecyclerAdapter extends RecyclerView.Adapter<LobbyRecyclerAdap
         // Your holder should contain a member variable
         // for any view that will be set as you render a row
         public TextView nameTextView;
-        public TextView descriptionTextView;
         public ImageView image;
 
         // We also create a constructor that accepts the entire item row
@@ -119,7 +116,6 @@ public class LobbyRecyclerAdapter extends RecyclerView.Adapter<LobbyRecyclerAdap
             super(itemView);
 
             nameTextView = (TextView) itemView.findViewById(R.id.lobby_user_name);
-            descriptionTextView = (TextView) itemView.findViewById(R.id.lobby_user_description);
             image = (ImageView) itemView.findViewById(R.id.lobby_user_image);
         }
     }
