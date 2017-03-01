@@ -4,17 +4,19 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
 
+import rx.subjects.PublishSubject;
+
 public class SuccessFacebookCallback implements FacebookCallback<LoginResult>{
 
-    private Callback callback;
+    private PublishSubject<LoginResult> callback = PublishSubject.create();
 
-    public SuccessFacebookCallback(Callback callback) {
-        this.callback = callback;
+    public PublishSubject<LoginResult> getCallbackSubject() {
+        return callback;
     }
 
     @Override
     public void onSuccess(LoginResult loginResult) {
-        callback.onSuccess(loginResult);
+        callback.onNext(loginResult);
     }
 
     @Override
@@ -24,10 +26,6 @@ public class SuccessFacebookCallback implements FacebookCallback<LoginResult>{
 
     @Override
     public void onError(FacebookException error) {
-
-    }
-
-    public interface Callback {
-        void onSuccess(LoginResult t);
+        callback.onError(error);
     }
 }

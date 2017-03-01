@@ -1,4 +1,4 @@
-package com.squad.view.main;
+package com.squad.view.login;
 
 import android.os.Bundle;
 
@@ -16,18 +16,18 @@ import java.util.List;
 
 import rx.Observable;
 
-public class MainModel {
+class LoginModel {
 
     private static final String USER_REFERENCE_STRING = "/users";
     private DatabaseReference userReference;
     private FirebaseDatabase firebaseDatabase;
 
-    public MainModel() {
+    LoginModel() {
         firebaseDatabase = FirebaseDatabase.getInstance();
         userReference = firebaseDatabase.getReference(USER_REFERENCE_STRING);
     }
 
-    public Observable<FacebookGraphResponse> getUser(AccessToken accessToken) {
+    Observable<FacebookGraphResponse> getUser(AccessToken accessToken) {
         return Observable.create(subscriber -> {
             GraphRequest request = GraphRequest.newMeRequest(
                     accessToken, (object, response) -> {
@@ -44,11 +44,11 @@ public class MainModel {
         });
     }
 
-    public Observable<List<FacebookGraphResponse>> getAllUsers() {
+    Observable<List<FacebookGraphResponse>> getAllUsers() {
         return RxFirebaseDatabase.observeSingleValueEvent(userReference, new FirebaseToListMapper<>(FacebookGraphResponse::create).map());
     }
 
-    public Observable<FacebookGraphResponse> storeUser(FacebookGraphResponse user) {
+    Observable<FacebookGraphResponse> storeUser(FacebookGraphResponse user) {
         return Observable.create(subscriber -> {
             DatabaseReference push = userReference.push();
             FacebookGraphResponse modifiedUser = FacebookGraphResponse.addFBId(user, push.getKey());
