@@ -99,7 +99,7 @@ public class LobbyActivity extends AppCompatActivity {
         createdAt.setText(ago);
         placeAddress.setText(lobby.location().address());
         placeName.setText(lobby.location().name());
-        hostName.setText("Organized by " + host.name() + " (" + host.points() + " points)");
+        hostName.setText("Organized by " + host.name());
 
         Picasso.with(LobbyActivity.this).load(host.picture().data().url()).transform(new CircleTransform()).into(hostImage);
 

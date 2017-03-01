@@ -2,7 +2,6 @@ package com.squad.view.chat;
 
 
 import android.content.Context;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.LayoutInflater;
@@ -14,8 +13,6 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.jakewharton.rxbinding.view.RxView;
 import com.squad.R;
 import com.squad.model.FacebookGraphResponse;
 import com.squad.view.profile.CircleTransform;
@@ -93,32 +90,6 @@ public class ChatMembersRecyclerAdapter  extends RecyclerView.Adapter<ChatMember
                 .load(user.picture().data().url())
                 .transform(new CircleTransform())
                 .into(holder.imageView);
-
-        RxView.clicks(holder.imageView).subscribe((aVoid)-> {
-
-           FirebaseDatabase.getInstance()
-                   .getReference("/users/" + user.fbId() + "/points")
-                   .addListenerForSingleValueEvent(new ValueEventListener() {
-                       @Override
-                       public void onDataChange(DataSnapshot dataSnapshot) {
-                           long num;
-                           if(dataSnapshot.getValue() == null) {
-                               num = 0;
-                           } else {
-                               num = (long) dataSnapshot.getValue() + 1;
-                           }
-                           FirebaseDatabase.getInstance()
-                                   .getReference("/users/" + user.fbId() + "/points")
-                                   .setValue(num);
-                           Snackbar.make(holder.imageView, holder.imageView.getContext().getString(R.string.points, user.name()), Snackbar.LENGTH_LONG).show();
-                       }
-
-                       @Override
-                       public void onCancelled(DatabaseError databaseError) {
-
-                       }
-                   });
-        });
     }
 
     @Override

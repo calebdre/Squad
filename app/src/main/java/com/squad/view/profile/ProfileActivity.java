@@ -56,7 +56,6 @@ public class ProfileActivity extends AppCompatActivity {
                     .name(user.name())
                     .id(user.id())
                     .picture(user.picture())
-                    .points(user.points())
                     .build();
 
             intent.putExtra(EXTRA_FB_USER, updatedUser);

@@ -45,7 +45,7 @@ public class LobbyRecyclerAdapter extends RecyclerView.Adapter<LobbyRecyclerAdap
 // Get the data model based on position
         FacebookGraphResponse user = users.get(position);
 
-        holder.nameTextView.setText(user.name() + " (" + user.points() + " points)");
+        holder.nameTextView.setText(user.name());
         Picasso.with(context).load(user.picture().data().url()).transform(new CircleTransform()).into(holder.image);
     }
 
