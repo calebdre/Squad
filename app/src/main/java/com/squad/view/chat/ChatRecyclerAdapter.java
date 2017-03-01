@@ -1,4 +1,4 @@
-package com.squad.chat;
+package com.squad.view.chat;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

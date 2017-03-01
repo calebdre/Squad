@@ -1,4 +1,4 @@
-package com.squad.chat;
+package com.squad.view.chat;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -23,11 +23,12 @@ import java.util.Calendar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.squad.lobby.LobbyActivity.EXTRA_LOBBY_KEY;
+import static com.squad.view.lobby.LobbyActivity.EXTRA_LOBBY_KEY;
 
 public class ChatActivity extends AppCompatActivity {
 
     @BindView(R.id.chat_messages) RecyclerView messagesList;
+    @BindView(R.id.chat_members) RecyclerView members;
     @BindView(R.id.chat_message_entry) EditText messageEntry;
     @BindView(R.id.chat_send_message_button) Button submitButton;
 
@@ -42,6 +43,10 @@ public class ChatActivity extends AppCompatActivity {
         ChatRecyclerAdapter adapter = new ChatRecyclerAdapter(key, user.fbId());
         messagesList.setLayoutManager(new LinearLayoutManager(this));
         messagesList.setAdapter(adapter);
+
+        ChatMembersRecyclerAdapter membersAdapter = new ChatMembersRecyclerAdapter(key);
+        members.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        members.setAdapter(membersAdapter);
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("lobbies/" + key + "/messages");
 

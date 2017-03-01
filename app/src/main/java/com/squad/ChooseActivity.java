@@ -7,8 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.LinearLayout;
 
 import com.jakewharton.rxbinding.view.RxView;
-import com.squad.create.CreateSquadActivity;
-import com.squad.join.JoinSquadActivity;
+import com.squad.view.create.CreateSquadActivity;
+import com.squad.view.join.JoinSquadActivity;
 import com.squad.model.FacebookGraphResponse;
 
 import butterknife.BindView;

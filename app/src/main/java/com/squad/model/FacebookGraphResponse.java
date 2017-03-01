@@ -17,6 +17,7 @@ public abstract class FacebookGraphResponse implements Serializable {
 
     public abstract String name();
     public abstract String id();
+    public abstract int points();
 
     @Nullable
     public abstract String about();
@@ -31,6 +32,7 @@ public abstract class FacebookGraphResponse implements Serializable {
                 .id(response.id())
                 .name(response.name())
                 .picture(response.picture())
+                .points(response.points())
                 .fbId(fbId)
                 .build();
     }
@@ -56,6 +58,7 @@ public abstract class FacebookGraphResponse implements Serializable {
     public static abstract class Builder {
         public abstract Builder name(String name);
         public abstract Builder id(String createdAt);
+        public abstract Builder points(int points);
         public abstract Builder about(String key);
         public abstract Builder picture(Picture activity);
         public abstract Builder fbId(String location);

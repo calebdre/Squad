@@ -2,4 +2,5 @@
     <string name="app_name">Squad</string>
     <string name="facebook_app_id">1670825073217913</string>
     <string name="squad_name">Your squad name will be <u>%s</u></string>
+    <string name="points">You just gave %s a fun point!</string>
 </resources>

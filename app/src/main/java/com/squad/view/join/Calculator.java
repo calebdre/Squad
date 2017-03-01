@@ -1,4 +1,4 @@
-package com.squad.join;
+package com.squad.view.join;
 
 public class Calculator {
 

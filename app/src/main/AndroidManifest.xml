@@ -22,7 +22,7 @@
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
 
 <!--Key password: state2018-->
-        <activity android:name=".main.MainActivity">
+        <activity android:name=".view.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -30,13 +30,13 @@
             </intent-filter>
         </activity>
         <activity android:name=".ChooseActivity"/>
-        <activity android:name=".create.CreateSquadActivity"
+        <activity android:name=".view.create.CreateSquadActivity"
                   android:label="Start a Squad"
                   android:windowSoftInputMode="adjustResize"/>
-        <activity android:name=".join.JoinSquadActivity"/>
-        <activity android:name=".lobby.LobbyActivity"/>
-        <activity android:name=".chat.ChatActivity"/>
-        <activity android:name=".profile.ProfileActivity"/>
+        <activity android:name=".view.join.JoinSquadActivity"/>
+        <activity android:name=".view.lobby.LobbyActivity"/>
+        <activity android:name=".view.chat.ChatActivity"/>
+        <activity android:name=".view.profile.ProfileActivity"/>
     </application>
 
 </manifest>

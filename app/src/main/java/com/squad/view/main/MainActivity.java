@@ -1,4 +1,4 @@
-package com.squad.main;
+package com.squad.view.main;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,7 +21,7 @@ import com.jakewharton.rxbinding.view.RxView;
 import com.squad.ChooseActivity;
 import com.squad.R;
 import com.squad.model.FacebookGraphResponse;
-import com.squad.profile.ProfileActivity;
+import com.squad.view.profile.ProfileActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
                     DatabaseReference myRef = database.getReference("users");
                     DatabaseReference push = myRef.push();
                     FacebookGraphResponse modifiedUser = FacebookGraphResponse.addFBId(user, push.getKey());
-
+                    database.getReference("users/" + push.getKey() + "/points").setValue(0);
                     push.setValue(modifiedUser.toFirebaseValue());
                     goToProfile(modifiedUser);
                 });

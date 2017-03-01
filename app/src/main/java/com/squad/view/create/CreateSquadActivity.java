@@ -1,4 +1,4 @@
-package com.squad.create;
+package com.squad.view.create;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,23 +18,19 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.jakewharton.rxbinding.view.RxView;
 import com.squad.R;
-import com.squad.lobby.LobbyActivity;
 import com.squad.model.FacebookGraphResponse;
 import com.squad.model.Lobby;
 import com.squad.model.MeetupLocation;
-
-import java.util.Calendar;
+import com.squad.view.lobby.LobbyActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import me.atrox.haikunator.HaikunatorBuilder;
 
 import static com.squad.ChooseActivity.EXTRA_FB_USER;
-import static com.squad.lobby.LobbyActivity.EXTRA_LOBBY_KEY;
+import static com.squad.view.lobby.LobbyActivity.EXTRA_LOBBY_KEY;
 
 public class CreateSquadActivity extends AppCompatActivity {
 
@@ -51,6 +47,7 @@ public class CreateSquadActivity extends AppCompatActivity {
     @BindView(R.id.create_squad_submit_button) FloatingActionButton submitButton;
 
     private MeetupLocation location;
+    private CreateSquadModel model;
 
     private static final String[] ACTIVITIES = new String[] {
             "Play put put", "Swim", "Go out to eat", "Watch GoT", "Workout", "Taking a long drive", "Movie night", "Dancing", "DnD",
@@ -64,6 +61,39 @@ public class CreateSquadActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_squad);
         ButterKnife.bind(this);
 
+        FacebookGraphResponse user = (FacebookGraphResponse) getIntent().getSerializableExtra(EXTRA_FB_USER);
+        model = new CreateSquadModel(user);
+
+        setupToolbar();
+
+        squadName = new HaikunatorBuilder().setTokenLength(0).setDelimiter(" ").build().haikunate();
+        squadNameView.setText(squadName );
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, ACTIVITIES);
+        activityInput.setAdapter(adapter);
+
+        RxView.clicks(placeInput).subscribe((aVoid) -> {
+            try {
+                Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY).build(this);
+                startActivityForResult(intent, 1);
+            } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+                // TODO: Handle the error.
+            }
+        });
+
+        RxView.clicks(submitButton).subscribe((aVoid) -> {
+            Lobby lobby = model.createSquad(activityInput.getText().toString(), squadName, location);
+
+            Intent intent = new Intent(this, LobbyActivity.class);
+            intent.putExtra(EXTRA_MEETUP_LOCATION, location);
+            intent.putExtra(EXTRA_FB_USER, user);
+            intent.putExtra(EXTRA_LOBBY, lobby);
+            intent.putExtra(EXTRA_LOBBY_KEY, lobby.id());
+            startActivity(intent);
+        });
+    }
+
+    private void setupToolbar() {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -71,56 +101,6 @@ public class CreateSquadActivity extends AppCompatActivity {
         toolbar.setNavigationIcon(R.drawable.left_arrow);
         toolbar.setNavigationOnClickListener((aVoid) -> {
             onBackPressed();
-        });
-
-        squadName = new HaikunatorBuilder().setTokenLength(0).setDelimiter(" ").build().haikunate();
-        squadNameView.setText(squadName );
-        placeInput.setKeyListener(null);
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, ACTIVITIES);
-        activityInput.setAdapter(adapter);
-
-        RxView.clicks(placeInput).subscribe((aVoid) -> {
-            try {
-                Intent intent =
-                        new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
-                                .build(this);
-                startActivityForResult(intent, 1);
-            } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
-                // TODO: Handle the error.
-            }
-        });
-
-        FacebookGraphResponse user = (FacebookGraphResponse) getIntent().getSerializableExtra(EXTRA_FB_USER);
-
-        RxView.clicks(submitButton).subscribe((aVoid) -> {
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference reference = database.getReference("lobbies");
-            DatabaseReference push = reference.push();
-            long timeStamp = Calendar.getInstance().getTimeInMillis();
-            Lobby lobby = Lobby.builder()
-                    .name(squadName)
-                    .firebaseKey(push.getKey())
-                    .createdAt(timeStamp)
-                    .location(location)
-                    .activity(activityInput.getText().toString())
-                    .host(user)
-                    .build();
-
-            push.child("name").setValue(squadName);
-            push.child("created").setValue(timeStamp);
-            push.child("location").setValue(location.toFirebaseValue());
-            push.child("activity").setValue(activityInput.getText().toString());
-            push.child("users").push().setValue(user.toFirebaseValue());
-            push.child("host").setValue(user.fbId());
-            push.child("ready").setValue(false);
-
-            Intent intent = new Intent(this, LobbyActivity.class);
-            intent.putExtra(EXTRA_MEETUP_LOCATION, location);
-            intent.putExtra(EXTRA_FB_USER, user);
-            intent.putExtra(EXTRA_LOBBY, lobby);
-            intent.putExtra(EXTRA_LOBBY_KEY, push.getKey());
-            startActivity(intent);
         });
     }
 
@@ -141,7 +121,6 @@ public class CreateSquadActivity extends AppCompatActivity {
                 placePrefix.setVisibility(View.VISIBLE);
                 placeInput.setText("Select a different location to meet");
 
-                Log.i(TAG, "Place: " + place.getName());
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(this, data);
                 // TODO: Handle the error.

@@ -1,4 +1,4 @@
-package com.squad.profile;
+package com.squad.view.profile;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;

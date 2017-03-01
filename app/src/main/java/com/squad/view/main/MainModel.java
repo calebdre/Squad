@@ -1,4 +1,4 @@
-package com.squad.main;
+package com.squad.view.main;
 
 import android.os.Bundle;
 

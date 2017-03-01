@@ -1,4 +1,4 @@
-package com.squad.chat;
+package com.squad.view.chat;
 
 import com.google.auto.value.AutoValue;
 import com.google.firebase.database.DataSnapshot;
