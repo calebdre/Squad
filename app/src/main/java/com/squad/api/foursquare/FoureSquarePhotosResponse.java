@@ -1,4 +1,4 @@
-package com.squad.foursquare;
+package com.squad.api.foursquare;
 
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;

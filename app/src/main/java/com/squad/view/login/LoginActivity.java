@@ -10,7 +10,7 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.firebase.FirebaseApp;
 import com.jakewharton.rxbinding.view.RxView;
-import com.squad.ChooseActivity;
+import com.squad.view.ChooseActivity;
 import com.squad.R;
 import com.squad.facebook.SuccessFacebookCallback;
 import com.squad.model.FacebookGraphResponse;

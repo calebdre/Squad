@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.jakewharton.rxbinding.view.RxView;
-import com.squad.ChooseActivity;
+import com.squad.view.ChooseActivity;
 import com.squad.R;
 import com.squad.model.FacebookGraphResponse;
 import com.squareup.picasso.Picasso;
@@ -19,7 +19,7 @@ import com.squareup.picasso.Picasso;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.squad.ChooseActivity.EXTRA_FB_USER;
+import static com.squad.view.ChooseActivity.EXTRA_FB_USER;
 
 public class ProfileActivity extends AppCompatActivity {
 

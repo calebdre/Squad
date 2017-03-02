@@ -14,7 +14,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.jakewharton.rxbinding.view.RxView;
-import com.squad.ChooseActivity;
+import com.squad.view.ChooseActivity;
 import com.squad.R;
 import com.squad.model.FacebookGraphResponse;
 

@@ -1,4 +1,4 @@
-package com.squad;
+package com.squad.view;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.LinearLayout;
 
 import com.jakewharton.rxbinding.view.RxView;
+import com.squad.R;
 import com.squad.view.create.CreateSquadActivity;
 import com.squad.view.join.JoinSquadActivity;
 import com.squad.model.FacebookGraphResponse;

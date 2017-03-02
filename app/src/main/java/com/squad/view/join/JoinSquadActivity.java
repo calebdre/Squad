@@ -18,7 +18,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.squad.ChooseActivity.EXTRA_FB_USER;
+import static com.squad.view.ChooseActivity.EXTRA_FB_USER;
 import static com.squad.view.lobby.LobbyActivity.EXTRA_LOBBY_KEY;
 
 public class JoinSquadActivity extends AppCompatActivity {

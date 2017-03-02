@@ -14,7 +14,6 @@ import android.widget.TextView;
 import com.google.firebase.database.FirebaseDatabase;
 import com.jakewharton.rxbinding.view.RxView;
 import com.squad.R;
-import com.squad.foursquare.FourSquare;
 import com.squad.model.FacebookGraphResponse;
 import com.squad.model.Lobby;
 import com.squad.view.chat.ChatActivity;
@@ -23,7 +22,6 @@ import com.squareup.picasso.Picasso;
 
 import org.ocpsoft.prettytime.PrettyTime;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -31,7 +29,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.squad.ChooseActivity.EXTRA_FB_USER;
+import static com.squad.view.ChooseActivity.EXTRA_FB_USER;
 
 public class LobbyActivity extends AppCompatActivity {
 
@@ -73,7 +71,7 @@ public class LobbyActivity extends AppCompatActivity {
 
         model.onReady().subscribe((isReady) -> {
             if (isReady) {
-                Intent intent = new Intent(LobbyActivity.this, ChatActivity.class);
+                Intent intent = new Intent(this, ChatActivity.class);
                 intent.putExtra(EXTRA_LOBBY_KEY, key);
                 intent.putExtra(EXTRA_FB_USER, user);
                 startActivity(intent);
@@ -84,20 +82,12 @@ public class LobbyActivity extends AppCompatActivity {
     }
 
     private void setupView(Lobby lobby, FacebookGraphResponse host) {
-        try {
-            new FourSquare().getImageForLocation(lobby.location().lat(), lobby.location().lng(), lobby.location().address(), (url) -> {
-                Picasso.with(LobbyActivity.this).load(url).into(lobbyImage);
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         PrettyTime p = new PrettyTime();
         String ago = p.format(new Date(lobby.createdAt()));
 
         activity.setText(lobby.activity());
         createdAt.setText(ago);
-        placeAddress.setText(lobby.location().address());
+        placeAddress.setText(lobby.location().location().address());
         placeName.setText(lobby.location().name());
         hostName.setText("Organized by " + host.name());
 

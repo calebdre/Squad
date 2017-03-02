@@ -18,6 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <LinearLayout
+            android:paddingBottom="24dp"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:fitsSystemWindows="true"
@@ -62,17 +63,20 @@
                     android:singleLine="true"/>
             </android.support.design.widget.TextInputLayout>
 
+            <android.support.design.widget.TextInputLayout
+                android:layout_marginTop="20dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <AutoCompleteTextView
+                    android:id="@+id/create_squad_place_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Where would you like to do it?"
+                    android:singleLine="true"/>
+            </android.support.design.widget.TextInputLayout>
 
-            <Button
-                style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"
-                android:textAllCaps="false"
-                android:background="?selectableItemBackground"
-                android:text="Select a location to meet"
-                android:layout_marginTop="30dp"
-                android:layout_marginLeft="16dp"
-                android:id="@+id/create_squad_place_input"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
 
             <TextView
                 android:id="@+id/create_squad_name_prefix"
@@ -83,14 +87,29 @@
                 android:visibility="invisible"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
-            <TextView
+
+            <LinearLayout
+                android:id="@+id/create_squad_place_meta_container"
                 android:layout_marginLeft="16dp"
-                android:text="Moe's"
-                android:textSize="20sp"
-                android:visibility="invisible"
-                android:id="@+id/create_squad_place_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="invisible">
+
+                <TextView
+                    android:text="Moe's"
+                    android:textSize="20sp"
+                    android:id="@+id/create_squad_place_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/create_squad_place_distance"
+                    android:textSize="14sp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
