@@ -30,8 +30,8 @@ public class PlaceAutocompleteAdapter extends ArrayAdapter<Venue> {
         }
         Venue venue = places.get(position);
         String text = venue.name();
-        if(venue.location().city() != null) {
-            text += " (" + venue.location().city() + ")";
+        if(venue.location().address() != null) {
+            text += " (" + venue.location().address() + ")";
         }
 
         ((TextView) convertView.findViewById(android.R.id.text1)).setText(text);

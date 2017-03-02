@@ -30,6 +30,8 @@ public class FourSquareClient {
         urlBuilder.addQueryParameter("client_secret", "15JDWN1U4EZJTOFQPAQB1SMMTERNYIVYMB2QF33QYFHJDTJK");
         urlBuilder.addQueryParameter("v", "20170101");
         urlBuilder.addQueryParameter("ll", lat + "," + lng);
+        urlBuilder.addQueryParameter("intent", "browse");
+        urlBuilder.addQueryParameter("radius", "48000");
 
         if(query != null) {
             urlBuilder.addQueryParameter("query", query);

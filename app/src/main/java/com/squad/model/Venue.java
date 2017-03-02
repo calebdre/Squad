@@ -11,7 +11,8 @@ import me.mattlogan.auto.value.firebase.annotation.FirebaseValue;
 @AutoValue @FirebaseValue
 public abstract class Venue {
     public abstract String id();
-    public abstract int distance();
+    @Nullable
+    public abstract String description();
     @Nullable
     public abstract String url();
     public abstract String name();

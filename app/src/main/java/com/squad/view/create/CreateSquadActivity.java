@@ -51,6 +51,7 @@ public class CreateSquadActivity extends AppCompatActivity implements CreateSqua
     @BindView(R.id.create_squad_place_meta_container) LinearLayout placeMetaContainer;
     @BindView(R.id.create_squad_place_name) TextView placeName;
     @BindView(R.id.create_squad_place_distance) TextView placeDistance;
+    @BindView(R.id.create_squad_place_description) TextView placeDescription;
     @BindView(R.id.create_squad_name_prefix) TextView placePrefix;
     @BindView(R.id.create_squad_submit_button) FloatingActionButton submitButton;
 
@@ -58,10 +59,7 @@ public class CreateSquadActivity extends AppCompatActivity implements CreateSqua
     private List<Venue> venues = new ArrayList<>();
     private Location userGPSCoords;
 
-    private static final String[] ACTIVITIES = new String[] {
-            "Play put put", "Swim", "Go out to eat", "Watch GoT", "Workout", "Taking a long drive", "Movie night", "Dancing", "DnD",
-            "Going to a conference", "PantherHackers Workshop", "Winning a hackathon"
-    };
+    private static final String[] ACTIVITIES = new String[]{"Play put put", "Swim", "Go out to eat", "Watch GoT", "Workout", "Taking a long drive", "Movie night", "Dancing", "DnD", "Going to a conference", "PantherHackers Workshop", "Winning a hackathon"};
 
     private String squadName;
     private PlaceAutocompleteAdapter placeAdapter;
@@ -78,13 +76,13 @@ public class CreateSquadActivity extends AppCompatActivity implements CreateSqua
         presenter.bindEvents();
 
         squadName = new HaikunatorBuilder().setTokenLength(0).setDelimiter(" ").build().haikunate();
-        squadNameView.setText(squadName );
+        squadNameView.setText(squadName);
 
         setupToolbar();
         setupAdapters();
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION }, 1);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
     }
 
@@ -118,29 +116,28 @@ public class CreateSquadActivity extends AppCompatActivity implements CreateSqua
 
     @Override
     public Observable<LobbyData> onSquadSubmit() {
-        Venue selectedVenue = viewState.getSelectedVenue();
-        return RxView.clicks(submitButton)
-                .doOnNext(aVoid -> {
-                    if (selectedVenue == null) {
-                        showError("Please select a venue from the dropdown.");
-                    }
-                })
-                .filter(aVoid -> selectedVenue != null)
-                .map(aVoid -> new LobbyData(activityInput.getText().toString(), squadName, selectedVenue));
+        return RxView.clicks(submitButton).doOnNext(aVoid -> {
+            if (viewState.getSelectedVenue() == null) {
+                showError("Please select a venue from the dropdown.");
+                return;
+            }
+
+            if (activityInput.getText().length() == 0) {
+                activityInput.setError("Please type an activity.");
+            } else {
+                activityInput.setError(null);
+            }
+        }).filter(aVoid -> viewState.getSelectedVenue() != null).map(aVoid -> new LobbyData(activityInput.getText().toString(), squadName, viewState.getSelectedVenue()));
     }
 
     @Override
     public Observable<String> onEnterLocationText() {
-        return RxTextView.afterTextChangeEvents(placeInput)
-                .debounce(100, TimeUnit.MILLISECONDS)
-                .map(event -> placeInput.getText().toString())
-                .filter(text -> text.length() > 2);
+        return RxTextView.afterTextChangeEvents(placeInput).debounce(100, TimeUnit.MILLISECONDS).map(event -> placeInput.getText().toString()).filter(text -> text.length() > 2);
     }
 
     @Override
     public Observable<Venue> onSelectedVenue() {
-        return RxAutoCompleteTextView.itemClickEvents(placeInput)
-                .map(event -> venues.get(event.position()));
+        return RxAutoCompleteTextView.itemClickEvents(placeInput).map(event -> venues.get(event.position()));
     }
 
     @Override
@@ -173,11 +170,23 @@ public class CreateSquadActivity extends AppCompatActivity implements CreateSqua
 
     private void setSelectedVenue(Venue selectedVenue) {
         com.squad.model.Location location = selectedVenue.location();
-        placeInput.setText(location.address());
+        if (location.address() != null) {
+            placeInput.setText(location.address());
+        } else {
+            placeInput.setText(selectedVenue.name());
+        }
+
         placeName.setText(selectedVenue.name());
+
         String distance = Calculator.distance(location.lat(), location.lng(), userGPSCoords.getLatitude(), userGPSCoords.getLongitude());
         placeDistance.setText(distance + "km");
+
         placeMetaContainer.setVisibility(View.VISIBLE);
+
+        if (selectedVenue.description() != null) {
+            placeDescription.setText(selectedVenue.description());
+            placeDescription.setVisibility(View.VISIBLE);
+        }
     }
 
     private void showError(String networkError) {
