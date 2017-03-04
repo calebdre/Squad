@@ -37,6 +37,7 @@
         <activity android:name=".view.lobby.LobbyActivity"/>
         <activity android:name=".view.chat.ChatActivity"/>
         <activity android:name=".view.profile.ProfileActivity"/>
+        <activity android:name=".view.dashboard.DashboardActivity"/>
     </application>
 
 </manifest>

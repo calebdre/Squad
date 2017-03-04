@@ -44,6 +44,7 @@ import static com.squad.view.lobby.LobbyActivity.EXTRA_LOBBY_KEY;
 
 public class CreateSquadActivity extends AppCompatActivity implements CreateSquadView {
 
+    public static final String EXTRA_USER_IS_HOST = "extra_user_is_host";
     @BindView(R.id.create_squad_activity_input) AutoCompleteTextView activityInput;
     @BindView(R.id.create_squad_toolbar) Toolbar toolbar;
     @BindView(R.id.create_squad_place_input) AutoCompleteTextView placeInput;
@@ -51,7 +52,6 @@ public class CreateSquadActivity extends AppCompatActivity implements CreateSqua
     @BindView(R.id.create_squad_place_meta_container) LinearLayout placeMetaContainer;
     @BindView(R.id.create_squad_place_name) TextView placeName;
     @BindView(R.id.create_squad_place_distance) TextView placeDistance;
-    @BindView(R.id.create_squad_place_description) TextView placeDescription;
     @BindView(R.id.create_squad_name_prefix) TextView placePrefix;
     @BindView(R.id.create_squad_submit_button) FloatingActionButton submitButton;
 
@@ -118,8 +118,10 @@ public class CreateSquadActivity extends AppCompatActivity implements CreateSqua
     public Observable<LobbyData> onSquadSubmit() {
         return RxView.clicks(submitButton).doOnNext(aVoid -> {
             if (viewState.getSelectedVenue() == null) {
-                showError("Please select a venue from the dropdown.");
+                placeInput.setError("Please select a venue from the dropdown.");
                 return;
+            } else {
+                placeInput.setError(null);
             }
 
             if (activityInput.getText().length() == 0) {
@@ -127,17 +129,22 @@ public class CreateSquadActivity extends AppCompatActivity implements CreateSqua
             } else {
                 activityInput.setError(null);
             }
-        }).filter(aVoid -> viewState.getSelectedVenue() != null).map(aVoid -> new LobbyData(activityInput.getText().toString(), squadName, viewState.getSelectedVenue()));
+        }).filter(aVoid -> viewState.getSelectedVenue() != null && activityInput.getText().length() != 0)
+        .map(aVoid -> new LobbyData(activityInput.getText().toString(), squadName, viewState.getSelectedVenue()));
     }
 
     @Override
     public Observable<String> onEnterLocationText() {
-        return RxTextView.afterTextChangeEvents(placeInput).debounce(100, TimeUnit.MILLISECONDS).map(event -> placeInput.getText().toString()).filter(text -> text.length() > 2);
+        return RxTextView.afterTextChangeEvents(placeInput)
+                .debounce(100, TimeUnit.MILLISECONDS)
+                .map(event -> placeInput.getText().toString())
+                .filter(text -> text.length() > 2);
     }
 
     @Override
     public Observable<Venue> onSelectedVenue() {
-        return RxAutoCompleteTextView.itemClickEvents(placeInput).map(event -> venues.get(event.position()));
+        return RxAutoCompleteTextView.itemClickEvents(placeInput)
+                .map(event -> venues.get(event.position()));
     }
 
     @Override
@@ -182,11 +189,6 @@ public class CreateSquadActivity extends AppCompatActivity implements CreateSqua
         placeDistance.setText(distance + "km");
 
         placeMetaContainer.setVisibility(View.VISIBLE);
-
-        if (selectedVenue.description() != null) {
-            placeDescription.setText(selectedVenue.description());
-            placeDescription.setVisibility(View.VISIBLE);
-        }
     }
 
     private void showError(String networkError) {
@@ -195,6 +197,7 @@ public class CreateSquadActivity extends AppCompatActivity implements CreateSqua
 
     private void goToLobby(Lobby lobby) {
         Intent intent = new Intent(this, LobbyActivity.class);
+        intent.putExtra(EXTRA_USER_IS_HOST, true);
         intent.putExtra(EXTRA_FB_USER, user);
         intent.putExtra(EXTRA_LOBBY_KEY, lobby.id());
         startActivity(intent);

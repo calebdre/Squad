@@ -1,16 +1,13 @@
 package com.squad.view.create;
 
-import android.support.annotation.Nullable;
-
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squad.api.foursquare.FourSquareClient;
-import com.squad.api.foursquare.FourSquareVenuesResponse;
+import com.squad.api.foursquare.FoureSquareMiniVenuesResponse;
 import com.squad.model.FacebookGraphResponse;
 import com.squad.model.Lobby;
 import com.squad.model.Venue;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 
@@ -54,7 +51,11 @@ public class CreateSquadModel {
         return lobby;
     }
 
-    public Observable<FourSquareVenuesResponse> getVenues(double lat, double lon, @Nullable String query) throws IOException {
+    public Observable<FoureSquareMiniVenuesResponse> getVenues(double lat, double lon, String query) {
         return fourSquareClient.getVenues(lat, lon, query);
+    }
+
+    public Observable<String> getImageUrl(String id) {
+        return fourSquareClient.getImageUrl(id);
     }
 }

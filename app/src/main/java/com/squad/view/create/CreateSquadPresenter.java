@@ -6,8 +6,6 @@ import com.squad.model.FacebookGraphResponse;
 import com.squad.model.Lobby;
 import com.squad.model.Venue;
 
-import java.io.IOException;
-
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 
@@ -35,7 +33,6 @@ public class CreateSquadPresenter {
     }
 
     private Action1<String> fetchLocationResults = query -> {
-        try {
             Location location = view.getLocation();
             model.getVenues(location.getLatitude(), location.getLongitude(), query)
                     .map(response -> response.response().venues())
@@ -43,10 +40,7 @@ public class CreateSquadPresenter {
                     .subscribe(venues -> {
                         viewState.setVenues(venues);
                         view.render(VENUES_RECIEVED);
-                    });
-        } catch (IOException e) {
-            view.render(VENUE_RETRIEVAL_ERROR);
-        }
+                    }, (e) -> view.render(VENUE_RETRIEVAL_ERROR));
     };
 
     private Action1<LobbyData> createSquad = lobbyInfo -> {

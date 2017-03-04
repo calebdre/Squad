@@ -19,6 +19,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.squad.view.ChooseActivity.EXTRA_FB_USER;
+import static com.squad.view.create.CreateSquadActivity.EXTRA_USER_IS_HOST;
 import static com.squad.view.lobby.LobbyActivity.EXTRA_LOBBY_KEY;
 
 public class JoinSquadActivity extends AppCompatActivity {
@@ -50,6 +51,7 @@ public class JoinSquadActivity extends AppCompatActivity {
                     .push()
                     .setValue(user.toFirebaseValue());
             Intent intent = new Intent(this, LobbyActivity.class);
+            intent.putExtra(EXTRA_USER_IS_HOST, false);
             intent.putExtra(EXTRA_LOBBY_KEY, id);
             intent.putExtra(EXTRA_FB_USER, user);
             startActivity(intent);

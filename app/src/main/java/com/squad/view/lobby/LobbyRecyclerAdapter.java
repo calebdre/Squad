@@ -8,22 +8,18 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.kelvinapps.rxfirebase.RxFirebaseChildEvent.EventType;
 import com.squad.R;
-import com.squad.model.FacebookGraphResponse;
 import com.squad.view.profile.CircleTransform;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class LobbyRecyclerAdapter extends RecyclerView.Adapter<LobbyRecyclerAdapter.LobbyRecyclerViewHolder> {
 
-    private List<FacebookGraphResponse> users;
-    private List<String> userIds = new ArrayList<>();
+    private List<UserUIItem> users;
     private Context context;
 
-    public LobbyRecyclerAdapter(Context context, List<FacebookGraphResponse> users) {
+    public LobbyRecyclerAdapter(Context context, List<UserUIItem> users) {
         this.context = context;
         this.users = users;
     }
@@ -43,47 +39,15 @@ public class LobbyRecyclerAdapter extends RecyclerView.Adapter<LobbyRecyclerAdap
     @Override
     public void onBindViewHolder(LobbyRecyclerViewHolder holder, int position) {
 // Get the data model based on position
-        FacebookGraphResponse user = users.get(position);
+        UserUIItem user = users.get(position);
 
         holder.nameTextView.setText(user.name());
-        Picasso.with(context).load(user.picture().data().url()).transform(new CircleTransform()).into(holder.image);
+        Picasso.with(context).load(user.pictureUrl()).transform(new CircleTransform()).into(holder.image);
     }
 
     @Override
     public int getItemCount() {
         return users.size();
-    }
-
-    public void updateDataset(FacebookGraphResponse user, EventType event, String userKey) {
-        switch (event) {
-            case ADDED:
-                addUser(user, userKey);
-                break;
-            case REMOVED:
-                removeUser(userKey);
-                break;
-            default:
-                throw new IllegalArgumentException("uh oh. Something happened to the user that we didn't account for");
-        }
-    }
-
-    private void removeUser(String userKey) {
-        // [START_EXCLUDE]
-        int userIndex = userIds.indexOf(userKey);
-        if (userIndex > -1) {
-            // Remove data from the list
-            userIds.remove(userIndex);
-            users.remove(userIndex);
-
-            // Update the RecyclerView
-            notifyItemRemoved(userIndex);
-        }
-    }
-
-    private void addUser(FacebookGraphResponse user, String userKey) {
-        userIds.add(userKey);
-        users.add(user);
-        notifyItemInserted(users.size() - 1);
     }
 
     public static class LobbyRecyclerViewHolder extends RecyclerView.ViewHolder {
