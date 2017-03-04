@@ -17,7 +17,8 @@ public abstract class Venue {
     public abstract String url();
     public abstract String name();
     public abstract Location location();
-
+    @Nullable
+    public abstract Photos photos();
 
     public static TypeAdapter<Venue> typeAdapter(Gson gson) {
         return new AutoValue_Venue.GsonTypeAdapter(gson);

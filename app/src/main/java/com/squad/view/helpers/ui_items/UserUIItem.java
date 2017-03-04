@@ -1,4 +1,4 @@
-package com.squad.view.lobby;
+package com.squad.view.helpers.ui_items;
 
 import com.squad.model.FacebookGraphResponse;
 

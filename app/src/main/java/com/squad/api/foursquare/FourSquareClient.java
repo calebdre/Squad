@@ -3,7 +3,8 @@ package com.squad.api.foursquare;
 
 import com.google.gson.GsonBuilder;
 import com.squad.GsonTypeAdapterFactory;
-import com.squad.api.foursquare.FoureSquarePhotosResponse.Response.Photos.Item;
+import com.squad.model.Item;
+import com.squad.model.Venue;
 
 import java.io.IOException;
 import java.util.List;
@@ -52,6 +53,40 @@ public class FourSquareClient {
 
                 subscriber.onNext(jsonResponse);
                 subscriber.unsubscribe();
+            }
+        }));
+    }
+
+    public Observable<Venue> getVenue(String id) {
+        String urlIntermediate = "https://api.foursquare.com/v2/venues/" + id;
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(urlIntermediate).newBuilder();
+        urlBuilder.addQueryParameter("client_id", "XVPZKBDVQJFNVPKICJPVUXUHHWE5PRZC5N2W2ZIF1TXISS42");
+        urlBuilder.addQueryParameter("client_secret", "15JDWN1U4EZJTOFQPAQB1SMMTERNYIVYMB2QF33QYFHJDTJK");
+        urlBuilder.addQueryParameter("v", "20170101");
+
+        String url = urlBuilder.build().toString();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        OkHttpClient client = new OkHttpClient();
+        return Observable.create(subscriber -> client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                subscriber.onError(e);
+                subscriber.unsubscribe();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String json = response.body().string();
+
+                FourSquareVenueResponse photosResponse = new GsonBuilder()
+                        .registerTypeAdapterFactory(GsonTypeAdapterFactory.create())
+                        .create().fromJson(json, FourSquareVenueResponse.class);
+                    subscriber.onNext(photosResponse.response().venue());
+                    subscriber.unsubscribe();
             }
         }));
     }

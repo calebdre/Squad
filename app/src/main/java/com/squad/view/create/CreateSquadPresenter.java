@@ -3,30 +3,24 @@ package com.squad.view.create;
 import android.location.Location;
 
 import com.squad.model.FacebookGraphResponse;
-import com.squad.model.Lobby;
-import com.squad.model.Venue;
+import com.squad.view.helpers.ui_items.VenueUiItem;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 
-import static com.squad.view.create.CreateSquadViewState.State.CREATED_SQUAD;
-import static com.squad.view.create.CreateSquadViewState.State.SELECTED_VENUE;
-import static com.squad.view.create.CreateSquadViewState.State.VENUES_RECIEVED;
-import static com.squad.view.create.CreateSquadViewState.State.VENUE_RETRIEVAL_ERROR;
-
-public class CreateSquadPresenter {
+class CreateSquadPresenter {
 
     private CreateSquadModel model;
     private CreateSquadView view;
-    private CreateSquadViewState viewState;
+    private CreateSquadViewStateMapper stateMapper;
 
-    public CreateSquadPresenter(CreateSquadView view, FacebookGraphResponse user) {
+    CreateSquadPresenter(CreateSquadView view, FacebookGraphResponse user) {
         this.view = view;
         model = new CreateSquadModel(user);
-        viewState = CreateSquadViewState.getInstance();
+        stateMapper = new CreateSquadViewStateMapper(view);
     }
 
-    public void bindEvents(){
+    void bindEvents(){
         view.onEnterLocationText().subscribe(fetchLocationResults);
         view.onSquadSubmit().subscribe(createSquad);
         view.onSelectedVenue().subscribe(cacheSelectedVenue); // in memory. not real cache
@@ -37,20 +31,14 @@ public class CreateSquadPresenter {
             model.getVenues(location.getLatitude(), location.getLongitude(), query)
                     .map(response -> response.response().venues())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(venues -> {
-                        viewState.setVenues(venues);
-                        view.render(VENUES_RECIEVED);
-                    }, (e) -> view.render(VENUE_RETRIEVAL_ERROR));
+                    .subscribe (
+                            venues -> stateMapper.renderVenuesReceivedState(venues),
+                            exception -> stateMapper.renderVenueRetrievalErrorState()
+                    );
     };
 
-    private Action1<LobbyData> createSquad = lobbyInfo -> {
-        Lobby lobby = model.createSquad(lobbyInfo.getActivity(), lobbyInfo.getSquadName(), lobbyInfo.getLocation());
-        viewState.setLobby(lobby);
-        view.render(CREATED_SQUAD);
-    };
+    private Action1<LobbyData> createSquad = lobbyInfo -> model.createSquad(lobbyInfo.getActivity(), lobbyInfo.getSquadName(), lobbyInfo.getVenueId())
+                                                                .subscribe(lobby -> stateMapper.renderSquadCreatedState(lobby));
 
-    private Action1<Venue> cacheSelectedVenue = venue -> {
-        viewState.setSelectedVenue(venue);
-        view.render(SELECTED_VENUE);
-    };
+    private Action1<VenueUiItem> cacheSelectedVenue = venue -> stateMapper.renderVenueSelectedState(venue);
 }

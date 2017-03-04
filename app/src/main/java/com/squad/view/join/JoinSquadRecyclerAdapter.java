@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import com.squad.R;
 import com.squad.model.Lobby;
+import com.squad.view.helpers.ui_items.LobbyUiItem;
+import com.squareup.picasso.Picasso;
 
 import org.ocpsoft.prettytime.PrettyTime;
 
@@ -45,11 +47,11 @@ public class JoinSquadRecyclerAdapter extends RecyclerView.Adapter<JoinSquadRecy
     @Override
     public void onBindViewHolder(JoinSquadRecyclerViewHolder holder, int position) {
         Lobby lobby = fireBaseLobbyList.get(position);
+        LobbyUiItem lobbyUiItem = new LobbyUiItem(lobby);
         holder.itemView.setOnClickListener(v -> lobbySubject.onNext(lobby.id()));
         PrettyTime p = new PrettyTime();
         String ago = p.format(new Date(lobby.createdAt()));
-
-
+        Picasso.with(context).load(lobbyUiItem.imageUrl()).into(holder.image);
         holder.title.setText(lobby.activity() + " at " + lobby.location().name());
     }
 

@@ -9,17 +9,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squad.R;
+import com.squad.view.helpers.ui_items.UserUIItem;
 import com.squad.view.profile.CircleTransform;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-public class LobbyRecyclerAdapter extends RecyclerView.Adapter<LobbyRecyclerAdapter.LobbyRecyclerViewHolder> {
+class LobbyRecyclerAdapter extends RecyclerView.Adapter<LobbyRecyclerAdapter.LobbyRecyclerViewHolder> {
 
     private List<UserUIItem> users;
     private Context context;
 
-    public LobbyRecyclerAdapter(Context context, List<UserUIItem> users) {
+    LobbyRecyclerAdapter(Context context, List<UserUIItem> users) {
         this.context = context;
         this.users = users;
     }
@@ -29,16 +30,13 @@ public class LobbyRecyclerAdapter extends RecyclerView.Adapter<LobbyRecyclerAdap
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
 
-        // Inflate the custom layout
         View contactView = inflater.inflate(R.layout.view_lobby_user, parent, false);
 
-        // Return a new holder instance
         return new LobbyRecyclerViewHolder(contactView);
     }
 
     @Override
     public void onBindViewHolder(LobbyRecyclerViewHolder holder, int position) {
-// Get the data model based on position
         UserUIItem user = users.get(position);
 
         holder.nameTextView.setText(user.name());
@@ -50,17 +48,11 @@ public class LobbyRecyclerAdapter extends RecyclerView.Adapter<LobbyRecyclerAdap
         return users.size();
     }
 
-    public static class LobbyRecyclerViewHolder extends RecyclerView.ViewHolder {
-        // Your holder should contain a member variable
-        // for any view that will be set as you render a row
-        public TextView nameTextView;
-        public ImageView image;
+    static class LobbyRecyclerViewHolder extends RecyclerView.ViewHolder {
+        TextView nameTextView;
+        ImageView image;
 
-        // We also create a constructor that accepts the entire item row
-        // and does the view lookups to find each subview
-        public LobbyRecyclerViewHolder(View itemView) {
-            // Stores the itemView in a public final member variable that can be used
-            // to access the context from any LobbyRecyclerViewHolder instance.
+        LobbyRecyclerViewHolder(View itemView) {
             super(itemView);
 
             nameTextView = (TextView) itemView.findViewById(R.id.lobby_user_name);

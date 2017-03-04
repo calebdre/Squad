@@ -4,6 +4,7 @@ package com.squad.view.join;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.kelvinapps.rxfirebase.RxFirebaseDatabase;
+import com.squad.api.foursquare.FourSquareClient;
 import com.squad.model.Lobby;
 import com.squad.util.FirebaseToListMapper;
 
@@ -22,6 +23,13 @@ public class JoinSquadModel {
     }
 
     public Observable<List<Lobby>> getLobbies() {
-        return RxFirebaseDatabase.observeSingleValueEvent(lobbyReference, new FirebaseToListMapper<>(Lobby::create).map());
+        return RxFirebaseDatabase.observeSingleValueEvent(lobbyReference, new FirebaseToListMapper<>(Lobby::create).map())
+                .doOnNext(lobbies -> {
+                    FourSquareClient client = new FourSquareClient();
+                    for (Lobby lobby: lobbies) {
+                        client.getImageUrl(lobby.location().id())
+                                .subscribe();
+                    }
+                });
     }
 }

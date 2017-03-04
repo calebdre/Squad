@@ -9,15 +9,15 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.squad.model.Venue;
+import com.squad.view.helpers.ui_items.VenueUiItem;
 
 import java.util.List;
 
-public class PlaceAutocompleteAdapter extends ArrayAdapter<Venue> {
+class PlaceAutocompleteAdapter extends ArrayAdapter<VenueUiItem> {
 
-    private List<Venue> places;
+    private List<VenueUiItem> places;
 
-    public PlaceAutocompleteAdapter(@NonNull Context context, List<Venue> places) {
+    PlaceAutocompleteAdapter(@NonNull Context context, List<VenueUiItem> places) {
         super(context, 0, places);
         this.places = places;
     }
@@ -28,10 +28,10 @@ public class PlaceAutocompleteAdapter extends ArrayAdapter<Venue> {
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(android.R.layout.simple_dropdown_item_1line, parent, false);
         }
-        Venue venue = places.get(position);
+        VenueUiItem venue = places.get(position);
         String text = venue.name();
-        if(venue.location().address() != null) {
-            text += " (" + venue.location().address() + ")";
+        if(venue.address() != null) {
+            text += " (" + venue.address() + ")";
         }
 
         ((TextView) convertView.findViewById(android.R.id.text1)).setText(text);
@@ -40,7 +40,7 @@ public class PlaceAutocompleteAdapter extends ArrayAdapter<Venue> {
 
     @Nullable
     @Override
-    public Venue getItem(int position) {
+    public VenueUiItem getItem(int position) {
         return places.get(position);
     }
 

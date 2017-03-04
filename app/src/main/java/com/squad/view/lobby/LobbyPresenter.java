@@ -8,13 +8,13 @@ import com.squad.model.Lobby;
 
 import rx.functions.Action1;
 
-public class LobbyPresenter {
+class LobbyPresenter {
 
     private LobbyModel model;
     private LobbyViewStateMapper stateTransfer;
     private final LobbyView view;
 
-    public LobbyPresenter(String lobbyId, LobbyView view) {
+    LobbyPresenter(String lobbyId, LobbyView view) {
         this.model = new LobbyModel(lobbyId);
         this.view = view;
 
@@ -28,15 +28,13 @@ public class LobbyPresenter {
         model.onReady().subscribe(onSquadReady);
     }
 
-    public void bindActions() {
+    void bindActions() {
         view.joinSquadClicks().subscribe(user -> stateTransfer.renderSquadJoinedState(user));
-        view.startSquadClicks().subscribe(startSquad);
+        view.startSquadClicks().subscribe(aVoid -> model.startSquad());
     }
 
     private Action1<Pair<Lobby, FacebookGraphResponse>> onReceiveLobby = lobbyUserPair -> {
         stateTransfer.renderLobbyReceivedState(lobbyUserPair);
-        model.getLobbyImage(lobbyUserPair.first.location().id())
-                .subscribe((url) -> stateTransfer.renderVenueImageReceived(url));
         model.onUserEvent().subscribe(eventTriple -> stateTransfer.renderUserEventState(eventTriple));
     };
 
@@ -44,9 +42,5 @@ public class LobbyPresenter {
         if (isReady) {
             stateTransfer.renderSquadStartedState();
         }
-    };
-
-    private Action1<Void> startSquad = aVoid -> {
-        model.startSquad();
     };
 }

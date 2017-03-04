@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -24,10 +25,8 @@ import com.jakewharton.rxbinding.widget.RxAutoCompleteTextView;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.squad.R;
 import com.squad.model.FacebookGraphResponse;
-import com.squad.model.Lobby;
-import com.squad.model.Venue;
-import com.squad.view.create.CreateSquadViewState.State;
-import com.squad.view.join.Calculator;
+import com.squad.view.helpers.ui_items.LobbyUiItem;
+import com.squad.view.helpers.ui_items.VenueUiItem;
 import com.squad.view.lobby.LobbyActivity;
 
 import java.util.ArrayList;
@@ -45,6 +44,9 @@ import static com.squad.view.lobby.LobbyActivity.EXTRA_LOBBY_KEY;
 public class CreateSquadActivity extends AppCompatActivity implements CreateSquadView {
 
     public static final String EXTRA_USER_IS_HOST = "extra_user_is_host";
+
+    private static final String[] ACTIVITIES = new String[]{"Play put put", "Swim", "Go out to eat", "Watch GoT", "Workout", "Taking a long drive", "Movie night", "Dancing", "DnD", "Going to a conference", "PantherHackers Workshop", "Winning a hackathon"};
+
     @BindView(R.id.create_squad_activity_input) AutoCompleteTextView activityInput;
     @BindView(R.id.create_squad_toolbar) Toolbar toolbar;
     @BindView(R.id.create_squad_place_input) AutoCompleteTextView placeInput;
@@ -55,15 +57,11 @@ public class CreateSquadActivity extends AppCompatActivity implements CreateSqua
     @BindView(R.id.create_squad_name_prefix) TextView placePrefix;
     @BindView(R.id.create_squad_submit_button) FloatingActionButton submitButton;
 
-    private CreateSquadViewState viewState = CreateSquadViewState.getInstance();
-    private List<Venue> venues = new ArrayList<>();
+    private List<VenueUiItem> venues = new ArrayList<>();
     private Location userGPSCoords;
-
-    private static final String[] ACTIVITIES = new String[]{"Play put put", "Swim", "Go out to eat", "Watch GoT", "Workout", "Taking a long drive", "Movie night", "Dancing", "DnD", "Going to a conference", "PantherHackers Workshop", "Winning a hackathon"};
-
+    private VenueUiItem selectedVenue;
     private String squadName;
     private PlaceAutocompleteAdapter placeAdapter;
-    private FacebookGraphResponse user;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -71,7 +69,7 @@ public class CreateSquadActivity extends AppCompatActivity implements CreateSqua
         setContentView(R.layout.activity_create_squad);
         ButterKnife.bind(this);
 
-        user = (FacebookGraphResponse) getIntent().getSerializableExtra(EXTRA_FB_USER);
+        FacebookGraphResponse user = (FacebookGraphResponse) getIntent().getSerializableExtra(EXTRA_FB_USER);
         CreateSquadPresenter presenter = new CreateSquadPresenter(this, user);
         presenter.bindEvents();
 
@@ -86,67 +84,6 @@ public class CreateSquadActivity extends AppCompatActivity implements CreateSqua
         }
     }
 
-    private void setupAdapters() {
-        ArrayAdapter<String> activityAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, ACTIVITIES);
-        placeAdapter = new PlaceAutocompleteAdapter(this, venues);
-
-        placeInput.setAdapter(placeAdapter);
-        activityInput.setAdapter(activityAdapter);
-    }
-
-    @Override
-    public void render(State state) {
-        switch (state) {
-            case CREATED_SQUAD:
-                goToLobby(viewState.getLobby());
-                break;
-            case VENUES_RECIEVED:
-                updateAutocomplete(viewState.getVenues());
-                break;
-            case VENUE_RETRIEVAL_ERROR:
-                showError(viewState.getNetworkError());
-                break;
-            case SELECTED_VENUE:
-                setSelectedVenue(viewState.getSelectedVenue());
-                break;
-            default:
-                throw new IllegalArgumentException("Illegal create squad state");
-        }
-    }
-
-    @Override
-    public Observable<LobbyData> onSquadSubmit() {
-        return RxView.clicks(submitButton).doOnNext(aVoid -> {
-            if (viewState.getSelectedVenue() == null) {
-                placeInput.setError("Please select a venue from the dropdown.");
-                return;
-            } else {
-                placeInput.setError(null);
-            }
-
-            if (activityInput.getText().length() == 0) {
-                activityInput.setError("Please type an activity.");
-            } else {
-                activityInput.setError(null);
-            }
-        }).filter(aVoid -> viewState.getSelectedVenue() != null && activityInput.getText().length() != 0)
-        .map(aVoid -> new LobbyData(activityInput.getText().toString(), squadName, viewState.getSelectedVenue()));
-    }
-
-    @Override
-    public Observable<String> onEnterLocationText() {
-        return RxTextView.afterTextChangeEvents(placeInput)
-                .debounce(100, TimeUnit.MILLISECONDS)
-                .map(event -> placeInput.getText().toString())
-                .filter(text -> text.length() > 2);
-    }
-
-    @Override
-    public Observable<Venue> onSelectedVenue() {
-        return RxAutoCompleteTextView.itemClickEvents(placeInput)
-                .map(event -> venues.get(event.position()));
-    }
-
     @Override
     public Location getLocation() {
         if (userGPSCoords == null) {
@@ -159,7 +96,77 @@ public class CreateSquadActivity extends AppCompatActivity implements CreateSqua
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    public void setSelectedVenue(VenueUiItem selectedVenue) {
+        if (selectedVenue.address() != null) {
+            placeInput.setText(selectedVenue.address());
+        } else {
+            placeInput.setText(selectedVenue.name());
+        }
+
+        placeName.setText(selectedVenue.name());
+        placeDistance.setText(selectedVenue.distanceFrom(userGPSCoords) + "km");
+
+        placeMetaContainer.setVisibility(View.VISIBLE);
+
+        this.selectedVenue = selectedVenue;
+    }
+
+    @Override
+    public void showError(String networkError) {
+        Snackbar.make(toolbar, networkError, Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void goToLobby(LobbyUiItem lobby) {
+        Intent intent = new Intent(this, LobbyActivity.class);
+        intent.putExtra(EXTRA_USER_IS_HOST, true);
+        intent.putExtra(EXTRA_FB_USER, getIntent().getSerializableExtra(EXTRA_FB_USER));
+        intent.putExtra(EXTRA_LOBBY_KEY, lobby.id());
+        startActivity(intent);
+    }
+
+    @Override
+    public void updateAutocomplete(List<VenueUiItem> newVenues) {
+        venues.clear();
+        venues.addAll(newVenues);
+        placeAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public Observable<LobbyData> onSquadSubmit() {
+        return RxView.clicks(submitButton).doOnNext(aVoid -> {
+            if (selectedVenue == null) {
+                placeInput.setError("Please select a venue from the dropdown.");
+                return;
+            } else {
+                placeInput.setError(null);
+            }
+
+            if (activityInput.getText().length() == 0) {
+                activityInput.setError("Please type an activity.");
+            } else {
+                activityInput.setError(null);
+            }
+        }).filter(aVoid -> selectedVenue != null && activityInput.getText().length() != 0)
+        .map(aVoid -> new LobbyData(activityInput.getText().toString(), squadName, selectedVenue.id()));
+    }
+
+    @Override
+    public Observable<String> onEnterLocationText() {
+        return RxTextView.afterTextChangeEvents(placeInput)
+                .debounce(100, TimeUnit.MILLISECONDS)
+                .map(event -> placeInput.getText().toString())
+                .filter(text -> text.length() > 2);
+    }
+
+    @Override
+    public Observable<VenueUiItem> onSelectedVenue() {
+        return RxAutoCompleteTextView.itemClickEvents(placeInput)
+                .map(event -> venues.get(event.position()));
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
             case 1: {
                 // If request is cancelled, the result arrays are empty.
@@ -175,38 +182,12 @@ public class CreateSquadActivity extends AppCompatActivity implements CreateSqua
         }
     }
 
-    private void setSelectedVenue(Venue selectedVenue) {
-        com.squad.model.Location location = selectedVenue.location();
-        if (location.address() != null) {
-            placeInput.setText(location.address());
-        } else {
-            placeInput.setText(selectedVenue.name());
-        }
+    private void setupAdapters() {
+        ArrayAdapter<String> activityAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, ACTIVITIES);
+        placeAdapter = new PlaceAutocompleteAdapter(this, venues);
 
-        placeName.setText(selectedVenue.name());
-
-        String distance = Calculator.distance(location.lat(), location.lng(), userGPSCoords.getLatitude(), userGPSCoords.getLongitude());
-        placeDistance.setText(distance + "km");
-
-        placeMetaContainer.setVisibility(View.VISIBLE);
-    }
-
-    private void showError(String networkError) {
-        Snackbar.make(toolbar, networkError, Snackbar.LENGTH_LONG).show();
-    }
-
-    private void goToLobby(Lobby lobby) {
-        Intent intent = new Intent(this, LobbyActivity.class);
-        intent.putExtra(EXTRA_USER_IS_HOST, true);
-        intent.putExtra(EXTRA_FB_USER, user);
-        intent.putExtra(EXTRA_LOBBY_KEY, lobby.id());
-        startActivity(intent);
-    }
-
-    private void updateAutocomplete(List<Venue> newVenues) {
-        venues.clear();
-        venues.addAll(newVenues);
-        placeAdapter.notifyDataSetChanged();
+        placeInput.setAdapter(placeAdapter);
+        activityInput.setAdapter(activityAdapter);
     }
 
     private void setupToolbar() {

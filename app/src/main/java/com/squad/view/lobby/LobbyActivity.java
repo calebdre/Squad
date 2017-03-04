@@ -17,6 +17,8 @@ import com.jakewharton.rxbinding.view.RxView;
 import com.squad.R;
 import com.squad.model.FacebookGraphResponse;
 import com.squad.view.dashboard.DashboardActivity;
+import com.squad.view.helpers.ui_items.LobbyUiItem;
+import com.squad.view.helpers.ui_items.UserUIItem;
 import com.squad.view.profile.CircleTransform;
 import com.squareup.picasso.Picasso;
 
@@ -74,6 +76,17 @@ public class LobbyActivity extends AppCompatActivity implements LobbyView {
     }
 
     @Override
+    public Observable<FacebookGraphResponse> joinSquadClicks() {
+        return RxView.clicks(joinSquadButton)
+                .map(aVoid -> (FacebookGraphResponse) getIntent().getExtras().getSerializable(EXTRA_FB_USER));
+    }
+
+    @Override
+    public Observable<Void> startSquadClicks() {
+        return Observable.empty();
+    }
+
+    @Override
     public void addUserToLobby(UserUIItem userUIItem) {
         users.add(userUIItem);
         adapter.notifyItemInserted(users.size() - 2);
@@ -98,7 +111,11 @@ public class LobbyActivity extends AppCompatActivity implements LobbyView {
         placeName.setText(lobbyUiItem.placeName());
         hostName.setText("Organized by " + hostUIItem.name());
 
-        Picasso.with(LobbyActivity.this).load(hostUIItem.pictureUrl()).transform(new CircleTransform()).into(hostImage);
+        Picasso.with(this).load(hostUIItem.pictureUrl()).transform(new CircleTransform()).into(hostImage);
+        String path = lobbyUiItem.imageUrl();
+        if (!path.isEmpty()) {
+            Picasso.with(this).load(path).into(lobbyImage);
+        }
 
         adapter = new LobbyRecyclerAdapter(this, users);
         usersList.setAdapter(adapter);
@@ -117,11 +134,6 @@ public class LobbyActivity extends AppCompatActivity implements LobbyView {
 
     }
 
-    @Override
-    public void renderVenueImage(String url) {
-        Picasso.with(this).load(url).into(lobbyImage);
-    }
-
     private void setupToolbar() {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -129,16 +141,5 @@ public class LobbyActivity extends AppCompatActivity implements LobbyView {
         toolbar.setTitle("Squad Details");
         toolbar.setNavigationIcon(R.drawable.left_arrow);
         toolbar.setNavigationOnClickListener((f) -> onBackPressed());
-    }
-
-    @Override
-    public Observable<FacebookGraphResponse> joinSquadClicks() {
-        return RxView.clicks(joinSquadButton)
-                .map(aVoid -> (FacebookGraphResponse) getIntent().getExtras().getSerializable(EXTRA_FB_USER));
-    }
-
-    @Override
-    public Observable<Void> startSquadClicks() {
-        return Observable.empty();
     }
 }
