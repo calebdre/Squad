@@ -8,11 +8,15 @@ import rx.Observable;
 
 interface LobbyView {
     void addUserToLobby(UserUIItem userUIItem);
+    void addCurrentUserToLobby(UserUIItem userUIItem);
     void removeUserFromLobby(UserUIItem userUIItem);
     void setupView(UserUIItem hostUIItem, LobbyUiItem lobbyUiItem);
     void goToDashboard();
-    void transformToJoinedLobby();
+    void setUserIsInSquad();
+    void setUserIsHost();
 
+    // boolean for whether or not the user is the host
     Observable<FacebookGraphResponse> joinSquadClicks();
     Observable<Void> startSquadClicks();
+    Observable<FacebookGraphResponse> leaveSquadClicks();
 }

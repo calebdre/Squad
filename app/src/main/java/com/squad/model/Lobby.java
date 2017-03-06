@@ -1,5 +1,7 @@
 package com.squad.model;
 
+import android.support.annotation.Nullable;
+
 import com.google.auto.value.AutoValue;
 import com.google.firebase.database.DataSnapshot;
 import com.google.gson.Gson;
@@ -22,6 +24,7 @@ public abstract class Lobby implements Serializable {
     public abstract Venue location();
     public abstract boolean ready();
     public abstract String host();
+    @Nullable
     public abstract Map<String, FacebookGraphResponse> users();
 
     public static Lobby create(DataSnapshot dataSnapshot) {

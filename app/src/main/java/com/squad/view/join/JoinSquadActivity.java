@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.google.firebase.database.FirebaseDatabase;
 import com.squad.R;
 import com.squad.model.FacebookGraphResponse;
 import com.squad.model.Lobby;
@@ -46,10 +45,6 @@ public class JoinSquadActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         adapter.onLobbySelect().subscribe((id) -> {
-            FirebaseDatabase.getInstance()
-                    .getReference("lobbies/" +id +"/users/")
-                    .push()
-                    .setValue(user.toFirebaseValue());
             Intent intent = new Intent(this, LobbyActivity.class);
             intent.putExtra(EXTRA_USER_IS_HOST, false);
             intent.putExtra(EXTRA_LOBBY_KEY, id);

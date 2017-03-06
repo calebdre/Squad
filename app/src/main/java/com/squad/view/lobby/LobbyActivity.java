@@ -7,10 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.jakewharton.rxbinding.view.RxView;
@@ -37,8 +35,6 @@ public class LobbyActivity extends AppCompatActivity implements LobbyView {
     public static final java.lang.String EXTRA_LOBBY_KEY = "extra_lobby_key";
 
     @BindView(R.id.lobby_toolbar) Toolbar toolbar;
-    @BindView(R.id.lobby_preview_text_area) LinearLayout previewTextArea;
-    @BindView(R.id.lobby_preview_button_area) LinearLayout previewButtonArea;
     @BindView(R.id.lobby_members_count) TextView memberCount;
     @BindView(R.id.lobby_item_image) ImageView lobbyImage;
     @BindView(R.id.lobby_host_image) ImageView hostImage;
@@ -48,10 +44,14 @@ public class LobbyActivity extends AppCompatActivity implements LobbyView {
     @BindView(R.id.lobby_place_address) TextView placeAddress;
     @BindView(R.id.lobby_place_name) TextView placeName;
     @BindView(R.id.lobby_users) RecyclerView usersList;
-    @BindView(R.id.lobby_join_squad_button) Button joinSquadButton;
+    @BindView(R.id.lobby_action_button) Button actionButton;
 
     private List<UserUIItem> users = new ArrayList<>();
+    private FacebookGraphResponse user;
     private LobbyRecyclerAdapter adapter;
+    private boolean isHost;
+    private boolean isInSquad;
+    private LobbyPresenter presenter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,41 +64,74 @@ public class LobbyActivity extends AppCompatActivity implements LobbyView {
         Bundle extras = getIntent().getExtras();
 
         String key = extras.getString(EXTRA_LOBBY_KEY);
-        boolean isHost = extras.getBoolean(EXTRA_USER_IS_HOST);
+        isHost = extras.getBoolean(EXTRA_USER_IS_HOST);
 
-        LobbyPresenter presenter = new LobbyPresenter(key, this);
+        user = (FacebookGraphResponse) getIntent().getExtras().getSerializable(EXTRA_FB_USER);
+        presenter = new LobbyPresenter(key, this, user);
         presenter.bindActions();
 
         if (isHost) {
-            previewButtonArea.setVisibility(View.GONE);
-            previewTextArea.setVisibility(View.GONE);
+            actionButton.setText("Start Squad!");
+        } else if (isInSquad){
+            actionButton.setText("Leave Squad");
+        } else {
+            actionButton.setText("Join Squad!");
         }
     }
 
     @Override
     public Observable<FacebookGraphResponse> joinSquadClicks() {
-        return RxView.clicks(joinSquadButton)
-                .map(aVoid -> (FacebookGraphResponse) getIntent().getExtras().getSerializable(EXTRA_FB_USER));
+        if (isHost || isInSquad) {
+            return Observable.empty();
+        } else {
+            return RxView.clicks(actionButton)
+                    .map(aVoid -> user);
+        }
     }
 
     @Override
     public Observable<Void> startSquadClicks() {
-        return Observable.empty();
+        if (isHost) {
+            return RxView.clicks(actionButton);
+        } else {
+            return Observable.empty();
+        }
+    }
+
+    @Override
+    public Observable<FacebookGraphResponse> leaveSquadClicks() {
+        if (isHost || !isInSquad) {
+            return Observable.empty();
+        } else {
+            return RxView.clicks(actionButton)
+                    .map(aVoid -> user);
+        }
     }
 
     @Override
     public void addUserToLobby(UserUIItem userUIItem) {
         users.add(userUIItem);
-        adapter.notifyItemInserted(users.size() - 2);
+        adapter.notifyItemInserted(users.size() - 1);
+        memberCount.setText(getString(R.string.number_of_members, users.size()));
+    }
+
+//   this is for when the user clicks "join squad" while
+//   the other method is for whenever anyone else joins the squad too
+    @Override
+    public void addCurrentUserToLobby(UserUIItem userUIItem) {
+        addUserToLobby(userUIItem);
+        setUserIsInSquad();
     }
 
     @Override
     public void removeUserFromLobby(UserUIItem userUIItem) {
         for (int i = 0; i < users.size(); i++) {
             UserUIItem userItem = users.get(i);
-            if (userItem.pictureUrl().equals(userUIItem.pictureUrl())) {
+            if (userItem.fbId().equals(userUIItem.fbId())) {
                 users.remove(i);
                 adapter.notifyItemRemoved(i);
+                memberCount.setText(getString(R.string.number_of_members, users.size()));
+                return;
             }
         }
     }
@@ -110,6 +143,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyView {
         placeAddress.setText(lobbyUiItem.address());
         placeName.setText(lobbyUiItem.placeName());
         hostName.setText("Organized by " + hostUIItem.name());
+        memberCount.setText(getString(R.string.number_of_members, lobbyUiItem.numberOfMembers()));
 
         Picasso.with(this).load(hostUIItem.pictureUrl()).transform(new CircleTransform()).into(hostImage);
         String path = lobbyUiItem.imageUrl();
@@ -130,8 +164,17 @@ public class LobbyActivity extends AppCompatActivity implements LobbyView {
     }
 
     @Override
-    public void transformToJoinedLobby() {
+    public void setUserIsInSquad() {
+        isInSquad = true;
+        actionButton.setText("Leave Squad");
+        presenter.bindActions();
+    }
 
+    @Override
+    public void setUserIsHost() {
+        actionButton.setText("Start Squad!");
+        isHost = true;
+        presenter.bindActions();
     }
 
     private void setupToolbar() {

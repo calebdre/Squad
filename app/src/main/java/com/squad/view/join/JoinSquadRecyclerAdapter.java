@@ -13,10 +13,7 @@ import com.squad.model.Lobby;
 import com.squad.view.helpers.ui_items.LobbyUiItem;
 import com.squareup.picasso.Picasso;
 
-import org.ocpsoft.prettytime.PrettyTime;
-
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import rx.subjects.PublishSubject;
@@ -49,10 +46,10 @@ public class JoinSquadRecyclerAdapter extends RecyclerView.Adapter<JoinSquadRecy
         Lobby lobby = fireBaseLobbyList.get(position);
         LobbyUiItem lobbyUiItem = new LobbyUiItem(lobby);
         holder.itemView.setOnClickListener(v -> lobbySubject.onNext(lobby.id()));
-        PrettyTime p = new PrettyTime();
-        String ago = p.format(new Date(lobby.createdAt()));
-        Picasso.with(context).load(lobbyUiItem.imageUrl()).into(holder.image);
         holder.title.setText(lobby.activity() + " at " + lobby.location().name());
+        if (!lobbyUiItem.imageUrl().isEmpty()) {
+            Picasso.with(context).load(lobbyUiItem.imageUrl()).into(holder.image);
+        }
     }
 
     @Override

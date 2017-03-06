@@ -17,4 +17,8 @@ public class UserUIItem {
     public String pictureUrl() {
         return user.picture().data().url();
     }
+
+    public String fbId() {
+        return user.fbId();
+    }
 }

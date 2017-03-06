@@ -1,13 +1,16 @@
 package com.squad.view.helpers.ui_items;
 
+import com.squad.model.FacebookGraphResponse;
 import com.squad.model.Group;
 import com.squad.model.Item;
 import com.squad.model.Lobby;
+import com.squad.model.Venue;
 
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class LobbyUiItem {
 
@@ -37,8 +40,22 @@ public class LobbyUiItem {
         return lobby.id();
     }
 
+    public int numberOfMembers() {
+        Map<String, FacebookGraphResponse> users = lobby.users();
+        if (users == null) {
+            return 0;
+        } else {
+            return users.size();
+        }
+    }
+
     public String imageUrl() {
-        List<Group> groups = lobby.location().photos().groups();
+        Venue location = lobby.location();
+
+        if (location.photos() == null) {
+            return "";
+        }
+        List<Group> groups = location.photos().groups();
         for (Group group : groups) {
             if (group.type().equals("venue")) {
                 Item item = group.items().get(0);

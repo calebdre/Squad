@@ -10,6 +10,8 @@ import com.squad.view.helpers.ui_items.UserUIItem;
 
 import org.apache.commons.lang3.tuple.Triple;
 
+import java.util.Map;
+
 class LobbyViewStateMapper {
 
     private LobbyView view;
@@ -33,20 +35,38 @@ class LobbyViewStateMapper {
         }
     }
 
-    void renderSquadJoinedState(FacebookGraphResponse user) {
+    void renderUserJoinedSquadState(FacebookGraphResponse user) {
         UserUIItem userUIItem = new UserUIItem(user);
-
-        view.addUserToLobby(userUIItem);
-        view.transformToJoinedLobby();
+        view.addCurrentUserToLobby(userUIItem);
     }
 
     void renderSquadStartedState() {
         view.goToDashboard();
     }
 
-    void renderLobbyReceivedState(Pair<Lobby, FacebookGraphResponse> lobbyUserPair) {
+    void renderLobbyReceivedState(Pair<Lobby, FacebookGraphResponse> lobbyUserPair, FacebookGraphResponse user) {
         UserUIItem hostUIItem = new UserUIItem(lobbyUserPair.second);
         LobbyUiItem lobbyUiItem = new LobbyUiItem(lobbyUserPair.first);
         view.setupView(hostUIItem, lobbyUiItem);
+
+        if (user.id().equals(lobbyUserPair.second.id())) {
+            view.setUserIsHost();
+            return;
+        }
+
+        Map<String, FacebookGraphResponse> users = lobbyUserPair.first.users();
+        if(users == null) return;
+
+        for (Map.Entry<String, FacebookGraphResponse> entry: users.entrySet()) {
+            if(entry.getValue().id().equals(user.id())) {
+                view.setUserIsInSquad();
+                return;
+            }
+        }
+    }
+
+    void renderUserLeftSquadState(FacebookGraphResponse user) {
+        UserUIItem userUIItem = new UserUIItem(user);
+        view.removeUserFromLobby(userUIItem);
     }
 }
