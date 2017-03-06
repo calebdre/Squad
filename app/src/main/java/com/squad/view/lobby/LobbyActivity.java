@@ -140,7 +140,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyView {
     public void setupView(UserUIItem hostUIItem, LobbyUiItem lobbyUiItem) {
         activity.setText(lobbyUiItem.activity());
         createdAt.setText(lobbyUiItem.timeSinceCreate());
-        placeAddress.setText(lobbyUiItem.address());
+        placeAddress.setText(lobbyUiItem.placeAddress());
         placeName.setText(lobbyUiItem.placeName());
         hostName.setText("Organized by " + hostUIItem.name());
         memberCount.setText(getString(R.string.number_of_members, lobbyUiItem.numberOfMembers()));

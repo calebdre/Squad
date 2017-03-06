@@ -3,7 +3,7 @@ package com.squad.view.helpers.ui_items;
 import android.location.Location;
 
 import com.squad.model.Venue;
-import com.squad.view.join.Calculator;
+import com.squad.util.GPSDistanceCalculator;
 
 public class VenueUiItem {
 
@@ -22,7 +22,7 @@ public class VenueUiItem {
     }
 
     public String distanceFrom(Location userCoords) {
-        return Calculator.distance(venue.location().lat(), venue.location().lng(), userCoords.getLatitude(), userCoords.getLongitude());
+        return GPSDistanceCalculator.distance(venue.location().lat(), venue.location().lng(), userCoords.getLatitude(), userCoords.getLongitude());
     }
 
     public String id() {

@@ -1,13 +1,19 @@
 package com.squad.view.helpers.ui_items;
 
+import android.location.Location;
+import android.support.annotation.Nullable;
+
+import com.squad.model.Category;
 import com.squad.model.FacebookGraphResponse;
 import com.squad.model.Group;
 import com.squad.model.Item;
 import com.squad.model.Lobby;
 import com.squad.model.Venue;
+import com.squad.util.GPSDistanceCalculator;
 
 import org.ocpsoft.prettytime.PrettyTime;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +34,7 @@ public class LobbyUiItem {
         return lobby.activity();
     }
 
-    public String address() {
+    public String placeAddress() {
         return lobby.location().location().address();
     }
 
@@ -64,5 +70,25 @@ public class LobbyUiItem {
         }
 
         return "";
+    }
+
+    @Nullable
+    public List<CategoryUiItem> categories() {
+        List<Category> categories = lobby.location().categories();
+        if (categories == null) {
+            return null;
+        }
+
+        List<CategoryUiItem> uiItems = new ArrayList<>();
+        for (Category category: categories) {
+            uiItems.add(new CategoryUiItem(category));
+        }
+
+        return uiItems;
+    }
+
+    public String distanceFrom(Location userCoords) {
+        com.squad.model.Location location = lobby.location().location();
+        return GPSDistanceCalculator.distance(location.lat(), location.lng(), userCoords.getLatitude(), userCoords.getLongitude());
     }
 }

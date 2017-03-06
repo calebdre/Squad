@@ -1,8 +1,8 @@
-package com.squad.view.join;
+package com.squad.util;
 
 import java.text.DecimalFormat;
 
-public class Calculator {
+public class GPSDistanceCalculator {
 
     public static String distance(double lat1, double lon1, double lat2, double lon2) {
         double theta = lon1 - lon2;

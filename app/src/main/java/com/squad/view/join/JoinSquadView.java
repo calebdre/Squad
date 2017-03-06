@@ -1,11 +1,14 @@
 package com.squad.view.join;
 
-import com.squad.model.Lobby;
+import android.location.Location;
 
-import rx.Observable;
+import com.squad.view.helpers.ui_items.LobbyUiItem;
+
+import java.util.List;
 
 
-public interface JoinSquadView {
+interface JoinSquadView {
 
-    Observable<Lobby> lobbySelectClicks();
+    void setupView(List<LobbyUiItem> lobbyUiItems);
+    Location getLocation();
 }

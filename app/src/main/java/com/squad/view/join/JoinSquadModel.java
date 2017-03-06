@@ -11,17 +11,18 @@ import java.util.List;
 
 import rx.Observable;
 
-public class JoinSquadModel {
-    public static final String LOBBY_REFERENCE_STRING = "/lobbies";
+class JoinSquadModel {
+    private static final String LOBBY_REFERENCE_STRING = "/lobbies";
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference lobbyReference;
 
-    public JoinSquadModel() {
+    JoinSquadModel() {
+
         firebaseDatabase = FirebaseDatabase.getInstance();
         lobbyReference = firebaseDatabase.getReference(LOBBY_REFERENCE_STRING);
     }
 
-    public Observable<List<Lobby>> getLobbies() {
+    Observable<List<Lobby>> getLobbies() {
         return RxFirebaseDatabase.observeSingleValueEvent(lobbyReference, new FirebaseToListMapper<>(Lobby::create).map());
     }
 }
