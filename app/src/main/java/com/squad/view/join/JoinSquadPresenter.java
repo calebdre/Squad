@@ -13,6 +13,6 @@ class JoinSquadPresenter {
     }
 
     private void init() {
-        model.getLobbies().subscribe(lobbies -> stateMapper.renderLobbiesRecievedState(lobbies));
+        model.getLobbies().subscribe(lobbies -> stateMapper.renderLobbiesReceivedState(lobbies));
     }
 }

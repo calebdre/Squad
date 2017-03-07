@@ -13,6 +13,11 @@ public class LocationHelper {
 
     public static Observable<Location> getUserLocation(Activity activity) {
         LocationManager locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+        //noinspection MissingPermission
+        Location lastKnown = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (lastKnown != null) {
+            return Observable.just(lastKnown);
+        }
 
         return Observable.create(subscriber -> {
             //noinspection MissingPermission
